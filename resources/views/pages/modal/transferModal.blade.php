@@ -79,25 +79,54 @@
         }, 300);
     });
 
-    document.getElementById('transferBtn').addEventListener('click', function () {
-        const technicians = JSON.parse(this.getAttribute('data-technicians'));
-        const transferSelect = document.getElementById('transferTo');
+    document.querySelectorAll('[id^=transferBtn]').forEach(button => {
+        button.addEventListener('click', function () {
+            const technicians = JSON.parse(this.getAttribute('data-technicians'));
+            const transferSelect = document.getElementById('transferTo');
+            console.log("technicians::", technicians);
+            transferSelect.innerHtML = '<option>Select Technician</option>'
 
-        transferSelect.innerHtML = '<option>Select Technician</option>'
+            technicians.forEach(tech => {
+                const option = document.createElement('option');
+                option.value = tech.userid;
+                option.textContent = `${tech.dtr_user?.fname || 'Unknown'} ${tech.dtr_user?.lname || 'Unknown'}`;
+                transferSelect.appendChild(option);
+            });
 
-        technicians.forEach(tech => {
-            const option = document.createElement('option');
-            option.value = tech.userid;
-            option.textContent = `${tech.dtr_user?.fname || 'Unknown'} ${tech.dtr_user?.lname || 'Unknown'}`;
-            transferSelect.appendChild(option);
+            const code = this.getAttribute('data-code');
+            const requestid = this.getAttribute('data-id');
+
+            document.getElementById('request_code').value = code;
+            document.getElementById('job_request_id').value = requestid;
+
+            transferSelect.classList.remove('is-invalid');
+            transferReason.classList.remove('is-invalid');
         });
+    });
 
-        const code = this.getAttribute('data-code');
-        const requestid = this.getAttribute('data-id');
-        console.log("code and id", code, requestid);
-        document.getElementById('request_code').value = code;
-        document.getElementById('job_request_id').value = requestid;
-        
+
+    document.querySelector('form[action*="technician.transfer"]').addEventListener('submit', function (e) {
+        const transferSelect = document.getElementById('transferTo');
+        const transferReason = document.getElementById('transferReason');
+        let valid = true;
+
+        if (!transferSelect.value) {
+            transferSelect.classList.add('is-invalid');
+            valid = false;
+        } else {
+            transferSelect.classList.remove('is-invalid');
+        }
+
+        if (!transferReason.value.trim()) {
+            transferReason.classList.add('is-invalid');
+            valid = false;
+        } else {
+            transferReason.classList.remove('is-invalid');
+        }
+
+        if (!valid) {
+            e.preventDefault(); // Stop form submission if validation fails
+        }
     });
 
     const transferModal = document.getElementById('transferModal');

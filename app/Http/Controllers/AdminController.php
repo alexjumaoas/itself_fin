@@ -47,7 +47,7 @@ class AdminController extends Controller
         $cancelledCount = Activity_request::where('status', 'cancelled')->count();
         $completedCount = Activity_request::where('status', 'completed')->count();
         $completedCount = Activity_request::where('status', 'transferred')->count();
-
+       
         return view("pages.admin.dashboard", compact('pendingCount', 'acceptedCount', 'completedCount','cancelledCount'));
     }
 
@@ -69,6 +69,7 @@ class AdminController extends Controller
             'dtrUsers' => function ($query) {
                 // Apply the filter inside the relation itself
                 $query->where('usertype', '!=', 2);
+                $query->where('usertype', '!=', 1);
             }
             ])
         ->where('division', 3)

@@ -30,11 +30,17 @@ class TechnicianController extends Controller
         ->with('dtrUser:username,fname,lname')
         ->where('userid', '!=', $user->userid)
         ->get();
-    
-        $job_pending = $this->jobRequestService->getJobRequestByStatus('pending');
+        
+        // $job_pending = $this->jobRequestService->getJobRequestByStatus('pending');
+        // $job_pending = $this->jobRequestService->getJobRequestByStatus('transferred');
+
+        $job_pending = collect($this->jobRequestService->getJobRequestByStatus('pending'))
+            ->merge($this->jobRequestService->getJobRequestByStatus('transferred'));
+
         $job_accepted = $this->jobRequestService->getJobRequestByStatus('accepted');
+        $job_transferred = $this->jobRequestService->getJobRequestByStatus('transferred');
      
-        return view('pages.admin.request',  compact('job_pending','job_accepted','get_technician'));
+        return view('pages.admin.request',  compact('job_pending','job_accepted','get_technician','job_transferred'));
     }
 
     // public function requestor(Request $req){

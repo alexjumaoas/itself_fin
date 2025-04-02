@@ -61,13 +61,13 @@
                                 </div>
                                 <div class="separator-solid"></div>
                                 <p class="card-category text-info">
-                                    <a>Started: <strong>{{ \Carbon\Carbon::parse($completed->request_history->assigned_date)->format('Y-m-d h:i:s A') }}</strong></a>
+                                    <a>Started: <strong>{{ \Carbon\Carbon::parse($completed->created_at)->format('Y-m-d h:i:s A') }}</strong></a>
                                 </p>
                                 <p class="card-category text-info mb-1">
-                                    <a>Ended: <strong>{{ \Carbon\Carbon::parse($completed->request_history->completion_date)->format('Y-m-d h:i:s A') }}</strong></a>
+                                    <a>Ended: <strong>{{ \Carbon\Carbon::parse($completed->created_at)->format('Y-m-d h:i:s A') }}</strong></a>
                                 </p>
                                 <h3 class="card-title">
-                                    <a>{{$completed->request_history->request_code}}</a>
+                                    <a>{{$completed->request_code}}</a>
                                 </h3>
                                 <div>
                                     <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>

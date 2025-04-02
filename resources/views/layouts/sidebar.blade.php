@@ -45,6 +45,12 @@ $pendingCount = 0;
         </span>
         <h4 class="text-section">Technician</h4>
     </li>
+    <li class="nav-item {{ request()->routeIs('tech.dashboard') ? 'active' : '' }}">
+        <a href="{{route('tech.dashboard')}}">
+            <i class="fas fa-home"></i>
+            <p>Dashboard</p>
+        </a>
+    </li>
     <li class="nav-item {{ request()->routeIs('technician.request') ? 'active' : '' }}">
         <a href="{{ route('technician.request') }}">
             <i class="fas fa-desktop"></i>

@@ -24,7 +24,6 @@ Route::middleware(['check.user.type:0', 'load.user.data'])->group(function () {
 
 // For Admin
 Route::middleware(['check.user.type:1', 'load.user.data'])->group(function () {
-
     Route::get('admin/dashboard', [AdminController::class, 'index'])->name('dashboard');
     Route::get('/admin/finished', [TechnicianController::class, 'finished'])->name('finished');
     Route::Post('/admin-technician', [AdminController::class, 'SavedTechnician'])->name('admin-technician');
@@ -37,6 +36,7 @@ Route::middleware(['check.user.type:1', 'load.user.data'])->group(function () {
 
 //technician
     Route::middleware(['check.user.type:2', 'load.user.data'])->group(function () {
+    Route::get('technician/dashboard', [AdminController::class, 'index'])->name('tech.dashboard');
     Route::Post('/technician/{job}/{code}/accept', [TechnicianController::class, 'acceptRequest'])->name('technician.accept');
     Route::get('/technician/request', [TechnicianController::class, 'requestor'])->name('technician.request');
     Route::get('/technician/finished', [TechnicianController::class, 'finished'])->name('technician.finished');

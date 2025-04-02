@@ -156,16 +156,18 @@
                             <div class="box bubble-shadow">
                                 <div class="header">
                                     <div class="part_one"><p style="margin-left: 8px; margin-top: 4px; color: white; font-size: 18px;">
-                                        <!-- {{ \Carbon\Carbon::parse($completed->request_history->completion_date)->format('F j, Y') }} -->
+                                        <!-- {{ \Carbon\Carbon::parse($completed->created_at)->format('F j, Y') }} -->
                                           2025-001
                                     </p></div>
                                     <div class="part_two"></div>
                                 </div>
                                 <div class="content">
-                                    <div class="mb-2" style="text-align: right;">{{ \Carbon\Carbon::parse($completed->request_history->completion_date)->format('F j, Y') }}</div>
-                                    <div class="mb-2" style="font-size: 18px;">{{$completed->request_history->request_code}}</div>
-                                    <div class="op-8">Started: {{ \Carbon\Carbon::parse($completed->request_history->assigned_date)->format('h:i:s A') }}</div>
-                                    <div class="op-8">Ended: {{ \Carbon\Carbon::parse($completed->request_history->completion_date)->format('h:i:s A') }}</div>
+                                    <div class="mb-2" style="text-align: right;">{{ \Carbon\Carbon::parse($completed->created_at)->format('F j, Y') }}</div>
+                                    <div class="mb-2" style="font-size: 18px;">{{$completed->request_code}}</div>
+                                    <div class="op-8">Started: </div>
+                                    <div class="op-8">Ended: </div>
+                                    {{-- <div class="op-8">Started: {{ \Carbon\Carbon::parse($completed->request_history->assigned_date)->format('h:i:s A') }}</div>
+                                    <div class="op-8">Ended: {{ \Carbon\Carbon::parse($completed->request_history->completion_date)->format('h:i:s A') }}</div> --}}
                                     <div class="mt-5">
                                         <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#jobModal{{$completed->id}}">Show Request</button>
                                     </div>
