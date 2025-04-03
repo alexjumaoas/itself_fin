@@ -1,3 +1,11 @@
+<style>
+    .activeTech {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+    }
+</style>
+
 <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
   <li class="nav-item topbar-icon dropdown hidden-caret d-flex d-lg-none">
     <a
@@ -23,7 +31,7 @@
     </ul>
   </li>
 
-@if($userInfo->usertype == 1)
+
   <li class="nav-item topbar-icon dropdown hidden-caret">
     <a
         class="nav-link dropdown-toggle"
@@ -116,7 +124,7 @@
         </li> -->
     </ul>
   </li>
-@endif
+
 
   <!-- <li class="nav-item topbar-icon dropdown hidden-caret">
     <a
@@ -416,3 +424,6 @@
     </ul>
   </li>
 </ul>
+
+<!-- @if($userInfo->usertype == 1) -->
+ <!-- @endif -->
