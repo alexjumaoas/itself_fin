@@ -85,7 +85,24 @@ class TechnicianController extends Controller
         $history_job->assigned_date = Carbon::now();
         $history_job->save();
 
-        return redirect()->route('technician.request')->with('success', 'Successfully accepted request!');
+        $activityRequest = Activity_request::with(['job_req.requester.sectionRel', 'job_req.requester.divisionRel'])
+        ->where('id', $act_req->id)
+        ->first();
+
+        return redirect()->route('technician.request')
+        ->with('success', 'Successfully accepted request!')
+        ->with('firebaseData', [
+            'request_code' => $code,
+            'tech_name' => $user->fname . ' ' . $user->lname,
+            'tech_id' => $user->userid,
+            'requester_name' => $activityRequest->job_req->requester->fname . ' ' . $activityRequest->job_req->requester->lname,
+            'section' => $activityRequest->job_req->requester->sectionRel->acronym,
+            'division' => $activityRequest->job_req->requester->divisionRel->description,
+            'timestamp' => Carbon::now()->toIso8601String(),
+            'status' => 'accepted'
+        ]);
+
+        // return redirect()->route('technician.request')->with('success', 'Successfully accepted request!');
     }
 
     public function finished(){

@@ -330,6 +330,28 @@ use App\Models\Dtruser;
             });
         });
 
+        document.addEventListener('DOMContentLoaded', function() {
+            const firebaseData = @json(session('firebaseData'));
+            
+            // Get reference to the Firebase database
+            const database = firebase.database();
+            
+            // Create a reference for the accepted requests
+            const requestsRef = database.ref('acceptedRequests');
+            
+            // Generate a new key for this request
+            const newRequestRef = requestsRef.push();
+            
+            // Save the data to Firebase
+            newRequestRef.set(firebaseData)
+                .then(() => {
+                    console.log('Request saved to Firebase successfully');
+                })
+                .catch((error) => {
+                    console.error('Error saving to Firebase:', error);
+                });
+        });
+
     </script>
 @endif
 

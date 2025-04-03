@@ -156,6 +156,7 @@
 @include('pages.modal.cancelCurrentReqModal')
 
 <script>
+
     function setCancelRequest(jobId, requestCode) {
         console.log("requestCode", requestCode);
         let form = document.getElementById('cancelRequestForm');
@@ -164,6 +165,7 @@
         document.getElementById('cancelJobId').value = jobId;
         document.getElementById('req_code').value = requestCode;
     }
+
 </script>
 
 @endsection
