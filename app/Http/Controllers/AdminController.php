@@ -8,12 +8,19 @@ use App\Models\Dtruser;
 use App\Models\Dts_user;
 use App\Models\Job_request;
 use App\Models\Request_History;
+use App\Services\JobRequestService;
 use App\Models\Activity_request;
 use Illuminate\Support\Facades\Redirect;
 
 class AdminController extends Controller
 {
     //
+    protected $jobRequestService;
+
+    public function __construct(JobRequestService $jobRequestService)
+    {
+        $this->jobRequestService = $jobRequestService;
+    }
 
     // public function index(){
     //     // , 'division', 'section'
@@ -40,15 +47,42 @@ class AdminController extends Controller
     //     return view('pages.admin.display_tech', compact('dts_users'));
     // }
 
-    public function index()
+    public function index(Request $req)
     {
-        $pendingCount = Activity_request::where('status', 'pending')->count();
-        $acceptedCount = Activity_request::where('status', 'accepted')->count();
-        $cancelledCount = Activity_request::where('status', 'cancelled')->count();
-        $completedCount = Activity_request::where('status', 'completed')->count();
-        $completedCount = Activity_request::where('status', 'transferred')->count();
-       
-        return view("pages.admin.dashboard", compact('pendingCount', 'acceptedCount', 'completedCount','cancelledCount'));
+
+        $user = $req->get('currentUser'); 
+        // $pendingCount = Activity_request::where('status', 'pending')->count();
+        // $acceptedCount = Activity_request::where('status', 'accepted')->count();
+        // $cancelledCount = Activity_request::where('status', 'cancelled')->count();
+        // $completedCount = Activity_request::where('status', 'completed')->count();
+        // $completedCount = Activity_request::where('status', 'transferred')->count();
+
+        $pendingCount = 0;
+        $acceptedCount = 0;
+        $completedCount = 0;
+        $cancelledCount = 0;
+        $traferredCount = 0;
+        $totalpending = 0;
+        $totalRequest = 0;
+        if($user->usertype == 1){
+            $pendingCount = $this->jobRequestService->getJobRequestByStatus('pending')->count();
+            $acceptedCount = $this->jobRequestService->getJobRequestByStatus('accepted')->count();
+            $completedCount = $this->jobRequestService->getJobRequestByStatus('completed')->count();
+            $cancelledCount = $this->jobRequestService->getJobRequestByStatus('cancelled')->count();
+            $traferredCount = $this->jobRequestService->getJobRequestByStatus('transferred')->count();
+            $totalpending = $pendingCount + $traferredCount;
+            $totalRequest = $totalpending  + $acceptedCount + $cancelledCount + $completedCount;
+        }else if($user->usertype == 2){
+            $pendingCount = $this->jobRequestService->getJobRequestByStatus('pending', $user->username)->count();
+            $acceptedCount = $this->jobRequestService->getJobRequestByStatus('accepted', $user->username)->count();
+            $completedCount = $this->jobRequestService->getJobRequestByStatus('completed', $user->username)->count();
+            $cancelledCount = $this->jobRequestService->getJobRequestByStatus('cancelled', $user->username)->count();
+            $traferredCount = $this->jobRequestService->getJobRequestByStatus('transferred',$user->username)->count();
+            $totalpending = $pendingCount + $traferredCount;
+            $totalRequest = $totalpending  + $acceptedCount + $cancelledCount + $completedCount;
+        }
+     
+        return view("pages.admin.dashboard", compact('totalpending', 'acceptedCount', 'completedCount','cancelledCount','traferredCount','totalRequest'));
     }
 
     public function getAllTechnican(){
