@@ -51,6 +51,7 @@
 </div>
 
 <div class="row">
+
     <div class="col-sm-6 col-md-3">
         <div class="card card-stats card-round">
             <div class="card-body">
@@ -65,7 +66,29 @@
                     <div class="col col-stats ms-3 ms-sm-0">
                         <div class="numbers">
                             <p class="card-category">Total</p>
-                            <h4 class="card-title">{{$acceptedCount}}</h4>
+                            <h4 class="card-title">{{$totalRequest}}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-md-3">
+        <div class="card card-stats card-round">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-icon">
+                        <div
+                            class="icon-big text-center icon-primary bubble-shadow-small"
+                        >
+                        <i class="fas fa-chart-bar"></i>
+                        </div>
+                    </div>
+                    <div class="col col-stats ms-3 ms-sm-0">
+                        <div class="numbers">
+                            <p class="card-category">Cancelled</p>
+                            <h4 class="card-title">{{$cancelledCount}}</h4>
                         </div>
                     </div>
                 </div>
@@ -87,7 +110,7 @@
                     <div class="col col-stats ms-3 ms-sm-0">
                         <div class="numbers">
                             <p class="card-category">Pending</p>
-                            <h4 class="card-title">{{$pendingCount}}</h4>
+                            <h4 class="card-title">{{$totalpending}}</h4>
                         </div>
                     </div>
                 </div>
@@ -109,7 +132,7 @@
                     <div class="col col-stats ms-3 ms-sm-0">
                         <div class="numbers">
                             <p class="card-category">Accepted</p>
-                            <h4 class="card-title">{{$cancelledCount}}</h4>
+                            <h4 class="card-title">{{$acceptedCount}}</h4>
                         </div>
                     </div>
                 </div>
