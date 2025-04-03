@@ -104,14 +104,17 @@ class TechnicianController extends Controller
         $done_req->request_code = $req->code;
         $done_req->job_request_id = $req->request_id;
         $done_req->status = "completed";
+        $done_req->action = $req->action;
+        $done_req->diagnosis = $req->diagnosis;
+        $done_req->resolution_notes = $req->resolution;
         $done_req->save();
 
-        $done = Request_History::where('request_code', $req->code)->first();
-        $done->action = $req->action;
-        $done->diagnosis = $req->diagnosis;
-        $done->resolution_notes = $req->resolution;
-        $done->completion_date = Carbon::now();
-        $done->save();
+        // $done = Request_History::where('request_code', $req->code)->first();
+        // $done->action = $req->action;
+        // $done->diagnosis = $req->diagnosis;
+        // $done->resolution_notes = $req->resolution;
+        // $done->completion_date = Carbon::now();
+        // $done->save();
 
         return Redirect::back()->with('success', 'Job well done!');
     }

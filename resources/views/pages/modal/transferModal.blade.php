@@ -68,24 +68,23 @@
 </div>
 
 <script>
-    document.getElementById("closeTransfer").addEventListener("click", function () {
+   $(document).on('click', '#closeTransfer', function () {
         let modalDialog = document.querySelector("#transferModal .modal-dialog");
-
         modalDialog.style.animation = "elasticPopOut 0.3s ease-in forwards";
-
         setTimeout(() => {
             $('#transferModal').modal('hide');
             modalDialog.style.animation = "";
         }, 300);
     });
-
+    
     document.querySelectorAll('[id^=transferBtn]').forEach(button => {
         button.addEventListener('click', function () {
             const technicians = JSON.parse(this.getAttribute('data-technicians'));
             const transferSelect = document.getElementById('transferTo');
-            console.log("technicians::", technicians);
-            transferSelect.innerHtML = '<option>Select Technician</option>'
-
+            
+            // Clear existing options first
+            transferSelect.innerHTML = '<option value="" disabled selected>Select Technician</option>';
+            
             technicians.forEach(tech => {
                 const option = document.createElement('option');
                 option.value = tech.userid;
@@ -100,40 +99,41 @@
             document.getElementById('job_request_id').value = requestid;
 
             transferSelect.classList.remove('is-invalid');
-            transferReason.classList.remove('is-invalid');
+            document.getElementById('transferReason').classList.remove('is-invalid');
         });
     });
 
+ 
+        document.querySelector('form[action*="technician.transfer"]').addEventListener('submit', function (e) {
+            const transferSelect = document.getElementById('transferTo');
+            const transferReason = document.getElementById('transferReason');
+            let valid = true;
 
-    document.querySelector('form[action*="technician.transfer"]').addEventListener('submit', function (e) {
+            if (!transferSelect.value) {
+                transferSelect.classList.add('is-invalid');
+                valid = false;
+            } else {
+                transferSelect.classList.remove('is-invalid');
+            }
+
+            if (!transferReason.value.trim()) {
+                transferReason.classList.add('is-invalid');
+                valid = false;
+            } else {
+                transferReason.classList.remove('is-invalid');
+            }
+
+            if (!valid) {
+                e.preventDefault(); // Stop form submission if validation fails
+            }
+        });
+
+    $('#transferModal').on('hide.bs.modal', function () {
+        $('#transferModal form')[0].reset();
+        
+        // Clear the dropdown options if needed
         const transferSelect = document.getElementById('transferTo');
-        const transferReason = document.getElementById('transferReason');
-        let valid = true;
-
-        if (!transferSelect.value) {
-            transferSelect.classList.add('is-invalid');
-            valid = false;
-        } else {
-            transferSelect.classList.remove('is-invalid');
-        }
-
-        if (!transferReason.value.trim()) {
-            transferReason.classList.add('is-invalid');
-            valid = false;
-        } else {
-            transferReason.classList.remove('is-invalid');
-        }
-
-        if (!valid) {
-            e.preventDefault(); // Stop form submission if validation fails
-        }
-    });
-
-    const transferModal = document.getElementById('transferModal');
-    transferModal.addEventListener('hidden.bs.modal', function () {
-        const transferToSelect = document.getElementById('transferTo');
-        transferToSelect.innerHTML = '<option>Select Technician</option>';
-        document.getElementById('transferReason').value = '';
+        transferSelect.innerHTML = '<option value="" disabled selected>Select Technician</option>';
     });
 </script>
 
