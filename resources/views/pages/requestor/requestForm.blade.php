@@ -21,7 +21,7 @@
         <h3 class="fw-bold mb-3">DASHBOARD</h3>
         <div class="row">
 
-            <div class="col-md-6 col-sm-6 dash">
+            <div class="col-md-6 col-sm-6 dash" data-toggle="modal" data-target="#dashModal">
                 <div class="card card-stats card-round">
                     <div class="card-body">
                         <div class="row align-items-center">
@@ -149,6 +149,8 @@
     </div>
 </div>
 
+@include('pages.modal.requestorDashModal')
+
 @if(session('success'))
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -165,6 +167,16 @@
 @endif
 
 <script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector(".dash").addEventListener("click", function () {
+            var dashModal = new bootstrap.Modal(document.getElementById("dashModal"));
+            dashModal.show();
+        });
+    });
+
+
+
     document.addEventListener("DOMContentLoaded", function () {
         const checkboxes = document.querySelectorAll(".form-check-input"); // Select all checkboxes
         const applyRequestBtn = document.querySelector("button[type='submit']"); // Submit button
