@@ -74,28 +74,6 @@
         </div>
     </div>
 
-    <div class="col-sm-6 col-md-3">
-        <div class="card card-stats card-round">
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-icon">
-                        <div
-                            class="icon-big text-center icon-primary bubble-shadow-small"
-                        >
-                        <i class="fas fa-chart-bar"></i>
-                        </div>
-                    </div>
-                    <div class="col col-stats ms-3 ms-sm-0">
-                        <div class="numbers">
-                            <p class="card-category">Cancelled</p>
-                            <h4 class="card-title">{{$cancelledCount}}</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <a class="col-sm-6 col-md-3 dash" href="{{ route('admin.request') }}">
         <div class="card card-stats card-round">
             <div class="card-body">
@@ -183,5 +161,29 @@
             </div>
         </div>
     </a>
+
+    <a class="col-sm-6 col-md-3 dash">
+        <div class="card card-stats card-round">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-icon">
+                        <div
+                            class="icon-big text-center icon-warning bubble-shadow-small"
+                        >
+                        <i class="fas fa-undo-alt"></i>
+                        </div>
+                    </div>
+                    <div class="col col-stats ms-3 ms-sm-0">
+                        <div class="numbers">
+                            <p class="card-category">Cancelled</p>
+                            <h4 class="card-title">{{$cancelledCount}}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </a>
+
+
 </div>
 @endsection

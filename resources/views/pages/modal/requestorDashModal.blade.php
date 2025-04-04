@@ -42,38 +42,54 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title" id="dashModalLabel">Previous Requests</h5>
+            <h5 class="modal-title" id="dashModalLabel">Requests History</h5>
         </div>
         <div class="modal-body">
             <div class="col-md-12">
-            <div class="table-responsive">
-                <div id="basic-datatables_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
-                <div class="row">
-                    <div class="col-sm-12">
-                    <table id="dashTable" class="table table-hover">
-                        <thead>
-                        <tr>
-                            <th>Date and Time</th>
-                            <th>Request Code</th>
-                            <th>Descriptions</th>
-                            <th>Technician</th>
-                            <th>Date Done</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>April 03, 2025 11:58 AM</td>
-                                <td>20250403115805-9577</td>
-                                <td>Install Software Application</td>
-                                <td>Juan Dela Cruz</td>
-                                <td>April 03, 2025 12:35 PM</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="table-responsive">
+                    <div id="basic-datatables_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="dashTable" class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Descriptions</th>
+                                            <th>Technician / Remarks</th>
+                                            <th>Done / Cancelled</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>April 03, 2025 11:58 AM</td>
+                                            <td>Install Software Application</td>
+                                            <td>Juan Dela Cruz</td>
+                                            <td>April 03, 2025 12:35 PM</td>
+                                            <td>Completed</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="dashTable" class="table table-hover">
+                                    <tbody>
+                                        <tr>
+                                            <td>April 03, 2025 11:58 AM</td>
+                                            <td>Check Monitor</td>
+                                            <td>Na ok rag iyaha</td>
+                                            <td>April 03, 2025 12:35 PM</td>
+                                            <td style="color: red;">Cancelled</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                </div>
-            </div>
             </div>
         </div>
         <div class="modal-footer">

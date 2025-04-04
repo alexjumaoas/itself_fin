@@ -21,7 +21,7 @@
         <h3 class="fw-bold mb-3">DASHBOARD</h3>
         <div class="row">
 
-            <div class="col-md-6 col-sm-6 dash" data-toggle="modal" data-target="#dashModal">
+            <div class="col-md-12 col-sm-6 dash" data-toggle="modal" data-target="#dashModal">
                 <div class="card card-stats card-round">
                     <div class="card-body">
                         <div class="row align-items-center">
@@ -40,27 +40,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="col-md-6 col-sm-6 dash">
-                <div class="card card-stats card-round">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col-icon">
-                                <div class="icon-big text-center icon-danger bubble-shadow-small">
-                                    <i class="fas fa-undo-alt"></i>
-                                </div>
-                            </div>
-                            <div class="col col-stats ms-3 ms-sm-0">
-                                <div class="numbers">
-                                    <p class="card-category">Cancel Requests</p>
-                                    <h4 class="card-title">12</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
 </div>
