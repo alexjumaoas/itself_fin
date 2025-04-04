@@ -169,22 +169,21 @@
         @include('layouts.customTemplate')
     </div>
 
-    <script>
-            // Your web app's Firebase configuration
-            const firebaseConfig = {
-                apiKey: "AIzaSyD4AIwE7b1wCUAqgQKqTzYhTWZ1suEoL8Y",
-                authDomain: "itself-3c41c.firebaseapp.com",
-                databaseURL: "https://itself-3c41c-default-rtdb.asia-southeast1.firebasedatabase.app",
-                projectId: "itself-3c41c",
-                storageBucket: "itself-3c41c.firebasestorage.app",
-                messagingSenderId: "865081651173",
-                appId: "1:865081651173:web:124dff13445781cf4f890c",
-                measurementId: "G-JVFWD126DM"
-            };
-            
-            // Initialize Firebase
-            firebase.initializeApp(firebaseConfig);
-      </script>
+        <script>
+                // // Your web app's Firebase configuration
+                // const firebaseConfig = {
+                //     apiKey: "AIzaSyD4AIwE7b1wCUAqgQKqTzYhTWZ1suEoL8Y",
+                //     authDomain: "itself-3c41c.firebaseapp.com",
+                //     databaseURL: "https://itself-3c41c-default-rtdb.asia-southeast1.firebasedatabase.app",
+                //     projectId: "itself-3c41c",
+                //     storageBucket: "itself-3c41c.firebasestorage.app",
+                //     messagingSenderId: "865081651173",
+                //     appId: "1:865081651173:web:124dff13445781cf4f890c",
+                //     measurementId: "G-JVFWD126DM"
+                // };
+                
+                // firebase.initializeApp(firebaseConfig);
+        </script>
     <!-- FlatPickr -->
     <script src="{{ asset('assets/js/flatpickr.min.js') }}"></script>
     

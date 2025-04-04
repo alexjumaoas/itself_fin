@@ -84,6 +84,9 @@
         <div class="page-header" style="margin-bottom: 0; margin-top: 10px;">
             <h3 class="fw-bold mb-3">ONGOING REQUEST(S)</h3>
         </div>
+        <div id="accepted-requests-container">
+            <!-- Latest request from Firebase will be displayed here -->
+        </div>
         @forelse($activity_acept as $accepted)
         <div class="col-md-4">
             <div class="card card-post card-round" style="border-top: 3px solid #6861ce;">
@@ -154,7 +157,8 @@
 </div>
 
 @include('pages.modal.cancelCurrentReqModal')
-
+<script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-database-compat.js"></script>
 <script>
 
     function setCancelRequest(jobId, requestCode) {
@@ -165,6 +169,124 @@
         document.getElementById('cancelJobId').value = jobId;
         document.getElementById('req_code').value = requestCode;
     }
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+            apiKey: "AIzaSyD4AIwE7b1wCUAqgQKqTzYhTWZ1suEoL8Y",
+            authDomain: "itself-3c41c.firebaseapp.com",
+            databaseURL: "https://itself-3c41c-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "itself-3c41c",
+            storageBucket: "itself-3c41c.firebasestorage.app",
+            messagingSenderId: "865081651173",
+            appId: "1:865081651173:web:124dff13445781cf4f890c",
+            measurementId: "G-JVFWD126DM"
+        };
+        
+    firebase.initializeApp(firebaseConfig);
+
+
+    const database = firebase.database();
+    // Reference to the acceptedRequests node
+    const requestsRef = database.ref('acceptedRequests');
+
+      // Listen for new accepted requests
+      requestsRef.on('child_added', (snapshot) => {
+        const requestData = snapshot.val();
+        const requestKey = snapshot.key;
+
+        console.log("requestKey:", requestKey);
+        // Call function to update UI
+        updateAcceptedRequestsUI(requestData);
+    });
+
+    // Listen for changes in existing requests
+    requestsRef.on('child_changed', (snapshot) => {
+        const updatedData = snapshot.val();
+        console.log("Updated Request:", updatedData);
+
+        // Update the specific request in UI
+        updateAcceptedRequestsUI(updatedData);
+    
+    });
+
+    // requestsRef.orderByChild('timestamp').limitToLast(1).on('child_added', (snapshot) => {
+    //     const latestRequest = snapshot.val();
+    //     updateAcceptedRequestsUI(latestRequest);
+    // })
+ 
+    function updateAcceptedRequestsUI(data) {
+
+        console.log("data1::", data);
+
+        let container = document.querySelector("#accepted-requests-container");
+
+        let card = document.createElement("div");
+        card.classList.add("col-md-3");
+      
+        card.innerHTML = `
+        
+             <div class="card card-post card-round" style="border-top: 3px solid #6861ce;">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="avatar">
+                            <img src="{{ asset('assets/img/profile2.jpg') }}" alt="..." class="avatar-img rounded-circle">
+                        </div>
+                        <div class="info-post ms-2">
+                            <p class="username">${data.requester_name}</p>
+                            <p class="text-muted">${data.section} - ${data.division}</p>
+                        </div>
+                    </div>
+                    <div class="separator-solid"></div>
+                    <p class="card-category text-info mb-1">
+                        <a>${new Date(data.timestamp).toLocaleString()}</a>
+                    </p>
+                    <h3 class="card-title">
+                        <a>${data.request_code}</a>
+                    </h3>
+                    <div>
+                        <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
+                         <ul id="request-list"></ul>
+                    </div>
+                    <div class="card-footer text-center bubble-shadow" style="background-color: #6861ce; color: white; padding: 10px;">
+                      <strong>${data.tech_name} is on the way</strong>
+                    </div>
+                </div>
+            </div>
+
+        `;
+
+        // Find the placeholder UL element
+        let ul = card.querySelector("#request-list");
+        
+        if(data.description){
+            // Process the description and append <li> items
+            const description = data.description.split(',').map(item => item.trim());
+            
+            description.forEach((task, index) => {
+                let li = document.createElement("li");
+
+                if (task === "Others" && description[index + 1]) {
+                    li.innerHTML = `<label>Others:</label> ${description[index + 1]}`;
+                } else if (index === 0 || description[index - 1] !== "Others") {
+                    li.innerHTML = `<label>${task}</label>`;
+                }
+
+                ul.appendChild(li);
+            });
+
+        }else{
+            let li = document.createElement("li");
+            li.innerHTML = "<label>No description available</label>";
+            ul.appendChild(li);
+        }
+        
+
+        // Append the card to the container
+        container.appendChild(card);
+
+    }
+
+
 
 </script>
 

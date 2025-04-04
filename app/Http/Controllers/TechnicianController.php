@@ -80,10 +80,8 @@ class TechnicianController extends Controller
         $act_req->status = "accepted";
         $act_req->save();
 
-        $history_job = new Request_History();
-        $history_job->request_code = $code;
-        $history_job->assigned_date = Carbon::now();
-        $history_job->save();
+        $job_req = Job_request::where('request_code', $code)->first();
+  
 
         $activityRequest = Activity_request::with(['job_req.requester.sectionRel', 'job_req.requester.divisionRel'])
         ->where('id', $act_req->id)
@@ -95,6 +93,7 @@ class TechnicianController extends Controller
             'request_code' => $code,
             'tech_name' => $user->fname . ' ' . $user->lname,
             'tech_id' => $user->userid,
+            'description' => $job_req->description,
             'requester_name' => $activityRequest->job_req->requester->fname . ' ' . $activityRequest->job_req->requester->lname,
             'section' => $activityRequest->job_req->requester->sectionRel->acronym,
             'division' => $activityRequest->job_req->requester->divisionRel->description,
