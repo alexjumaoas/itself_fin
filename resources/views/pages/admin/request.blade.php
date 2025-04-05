@@ -128,13 +128,11 @@ use App\Models\Dtruser;
 </div>
 
 <!-- ONGOING CARDS -->
-<div class="row">
+<div class="row" id="requests-row">
     <div class="page-header" style="margin-bottom: 0; margin-top: 10px;">
         <h1 class="fw-bold mb-3">ONGOING</h1>
     </div>
-    <div id="accepted-requests-container">
-        <!-- Latest request from Firebase will be displayed here -->
-    </div>
+
     <!-- PUT A FOR-LOOP CONTITION HERE -->
     @forelse($job_accepted as $accepted)
         <div class="col-md-3">
@@ -232,7 +230,6 @@ use App\Models\Dtruser;
         </div>
     @endforelse
 </div>
-
 
 <!-- TRANSFER CARDS -->
 <div class="row">
@@ -348,30 +345,23 @@ use App\Models\Dtruser;
                 text: "{{ session('success') }}",
                 icon: "success",
                 button: "OK",
-                timer: 5000 // Auto close after 3 seconds
+                timer: 5000 // Auto close after 5 seconds
             });
         });
 
         document.addEventListener('DOMContentLoaded', function() {
             const firebaseData = @json(session('firebaseData'));
-            
-            // Get reference to the Firebase database
             const database = firebase.database();
-            
-            // Create a reference for the accepted requests
             const requestsRef = database.ref('acceptedRequests');
-            
-            // Generate a new key for this request
             const newRequestRef = requestsRef.push();
-            
-            // Save the data to Firebase
+
             newRequestRef.set(firebaseData)
                 .then(() => {
                     console.log('Request saved to Firebase successfully');
                 })
                 .catch((error) => {
                     console.error('Error saving to Firebase:', error);
-                });
+            });
         });
 
     </script>
@@ -381,7 +371,7 @@ use App\Models\Dtruser;
     var user = @json($userInfo);
 
     const database = firebase.database();
-    // Reference to the acceptedRequests node
+
     const requestsRef = database.ref('acceptedRequests');
   
         // Listen for new accepted requests
@@ -389,38 +379,41 @@ use App\Models\Dtruser;
             const requestData = snapshot.val();
             const requestKey = snapshot.key;
 
+        requestsRef.on('child_added', (snapshot) => {
+            const requestData = snapshot.val();
+            const requestKey = snapshot.key;
+
+        requestsRef.on('child_added', (snapshot) => {
+            const requestData = snapshot.val();
+            const requestKey = snapshot.key;
+
             console.log("requestKey:", requestKey);
 
-            // Call function to update UI
             updateAcceptedRequestsUI(requestData);
             setTimeout(() => {
                 deleteaccepted(requestKey);
             }, 2000);
-        });
+    });
 
-        // Listen for changes in existing requests
-        requestsRef.on('child_changed', (snapshot) => {
-            const updatedData = snapshot.val();
-            console.log("Updated Request:", updatedData);
-            
-            // Update the specific request in UI
-            updateAcceptedRequestsUI(updatedData);
+    requestsRef.on('child_changed', (snapshot) => {
+        const updatedData = snapshot.val();
+        console.log("Updated Request:", updatedData);
         
-        });
+        updateAcceptedRequestsUI(updatedData);
+    
+    });
 
     function updateAcceptedRequestsUI(data) {
-
         console.log("data1::", data, user.userid);
         if(user.userid == data.tech_id) return;
 
-        let container = document.querySelector("#accepted-requests-container");
+        let requestsRow = document.querySelector("#requests-row");
 
-        let card = document.createElement("div");
-        card.classList.add("col-md-3");
+        let cardWrapper = document.createElement("div");
+        cardWrapper.classList.add("col-md-3");
 
-        card.innerHTML = `
-        
-             <div class="card card-post card-round" style="border-top: 3px solid #6861ce;">
+        cardWrapper.innerHTML = `
+            <div class="card card-post card-round" style="border-top: 3px solid #6861ce;">
                 <div class="card-body">
                     <div class="d-flex">
                         <div class="avatar">
@@ -442,19 +435,18 @@ use App\Models\Dtruser;
                         <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
                          <ul id="request-list"></ul>
                     </div>
-                    <div class="card-footer text-center bubble-shadow" style="background-color: #6861ce; color: white; padding: 10px;">
+                </div>
+                <div class="card-footer text-center bubble-shadow w-100" style="background-color: #6861ce; color: white; padding: 10px;">
                       <strong>Accepted by: ${data.tech_name}</strong>
-                    </div>
                 </div>
             </div>
-
         `;
 
-        // Find the placeholder UL element
-        let ul = card.querySelector("#request-list");
+        requestsRow.appendChild(cardWrapper);
+
+        let ul = cardWrapper.querySelector("#request-list");
         
         if(data.description){
-            // Process the description and append <li> items
             const description = data.description.split(',').map(item => item.trim());
             
             description.forEach((task, index) => {
@@ -474,11 +466,6 @@ use App\Models\Dtruser;
             li.innerHTML = "<label>No description available</label>";
             ul.appendChild(li);
         }
-        
-
-        // Append the card to the container
-        container.appendChild(card);
-
     }
 
     function deleteaccepted(accepted_key){
@@ -658,7 +645,6 @@ use App\Models\Dtruser;
             console.log("error deleting pending request firebase");
         })
     }
-
 </script>
 
 @endsection

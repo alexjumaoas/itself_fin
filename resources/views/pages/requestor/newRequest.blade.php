@@ -1,12 +1,6 @@
 @extends('layouts.appClient')
 @section('content')
 
-<?php
-
-
-
-?>
-
 <div class="container">
     <!-- CURRENT REQUEST-->
     <div class="row">
@@ -80,63 +74,61 @@
     </div>
 
     <!-- ONGOING REQUEST-->
-    <div class="row">
+    <div class="row" id="requests-row">
         <div class="page-header" style="margin-bottom: 0; margin-top: 10px;">
             <h3 class="fw-bold mb-3">ONGOING REQUEST(S)</h3>
         </div>
-        <div id="accepted-requests-container">
-            <!-- Latest request from Firebase will be displayed here -->
-        </div>
+       
         @forelse($activity_acept as $accepted)
-        <div class="col-md-4">
-            <div class="card card-post card-round" style="border-top: 3px solid #6861ce;">
-                <div class="card-body">
-                    <div class="d-flex">
-                        <div class="avatar">
-                            <img src="{{ asset('assets/img/profile2.jpg') }}" alt="..." class="avatar-img rounded-circle">
+            <div class="col-md-4">
+                <div class="card card-post card-round" style="border-top: 3px solid #6861ce;">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="avatar">
+                                <img src="{{ asset('assets/img/profile2.jpg') }}" alt="..." class="avatar-img rounded-circle">
+                            </div>
+                            <div class="info-post ms-2">
+                                <p class="username">{{$accepted->job_req->requester->fname . ' ' . $accepted->job_req->requester->lname}}</p>
+                                <p class="date text-muted">{{$accepted->job_req->requester->sectionRel->acronym}} Section {{ $accepted->job_req->requester->divisionRel->description}}</p>
+                            </div>
                         </div>
-                        <div class="info-post ms-2">
-                            <p class="username">{{$accepted->job_req->requester->fname . ' ' . $accepted->job_req->requester->lname}}</p>
-                            <p class="date text-muted">{{$accepted->job_req->requester->sectionRel->acronym}} Section {{ $accepted->job_req->requester->divisionRel->description}}</p>
+                        <div class="separator-solid"></div>
+                        <p class="card-category text-info mb-1">
+                            <a>{{\Carbon\Carbon::parse($accepted->job_req->request_date)->format('F d, Y h:i A')}}</a>
+                        </p>
+                        <h3 class="card-title">
+                            <a>{{$accepted->request_code}}</a>
+                        </h3>
+                        <div>
+                            <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
+                            <ul>
+                                @php
+                                    $tasks = explode(',', $accepted->job_req->description);
+                                    $tasks = array_map('trim', $tasks);
+                                @endphp
+                                @foreach($tasks as $index => $task)
+                                    @if($task === 'Others' && isset($tasks[$index + 1]))
+                                        <li>
+                                            <label>Others:</label>
+                                            {{ $tasks[$index + 1] }}
+                                        </li>
+                                    @elseif($index === 0 || ($tasks[$index - 1] !== 'Others'))
+                                        <li>
+                                            <label>{{ $task }}</label>
+                                        </li>
+                                    @endif
+                                @endforeach
+                            </ul>
                         </div>
                     </div>
-                    <div class="separator-solid"></div>
-                    <p class="card-category text-info mb-1">
-                        <a>{{\Carbon\Carbon::parse($accepted->job_req->request_date)->format('F d, Y h:i A')}}</a>
-                    </p>
-                    <h3 class="card-title">
-                        <a>{{$accepted->request_code}}</a>
-                    </h3>
-                    <div>
-                        <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
-                        <ul>
-                            @php
-                                $tasks = explode(',', $accepted->job_req->description);
-                                $tasks = array_map('trim', $tasks); // Trim whitespace from each item
-                            @endphp
-                            @foreach($tasks as $index => $task)
-                                @if($task === 'Others' && isset($tasks[$index + 1]))
-                                    <li>
-                                        <label>Others:</label>
-                                        {{ $tasks[$index + 1] }}
-                                    </li>
-                                @elseif($index === 0 || ($tasks[$index - 1] !== 'Others'))
-                                    <li>
-                                        <label>{{ $task }}</label>
-                                    </li>
-                                @endif
-                            @endforeach
-                        </ul>
+                    @php
+                        $user = App\Models\Dtruser::where('username', $accepted->tech_from)->first();
+                    @endphp
+                    <div class="card-footer text-center bubble-shadow" style="background-color: #6861ce; color: white; padding: 10px;">
+                        <strong> {{$user ? $user->fname. ' ' . $user->mname. ' ' . $user->lname : 'N/A'}}</strong> is on the way
                     </div>
-                </div>
-                @php
-                    $user = App\Models\Dtruser::where('username', $accepted->tech_from)->first();
-                @endphp
-                <div class="card-footer text-center bubble-shadow" style="background-color: #6861ce; color: white; padding: 10px;">
-                    <strong> {{$user ? $user->fname. ' ' . $user->mname. ' ' . $user->lname : 'N/A'}}</strong> is on the way
                 </div>
             </div>
-        </div>
         @empty
             <!-- FOR ONGOING REQUEST, IF EMPTY OR NOT -->
             <div class="col-sm-6 col-md-12">
@@ -170,7 +162,6 @@
         document.getElementById('req_code').value = requestCode;
     }
 
-    // Your web app's Firebase configuration
     const firebaseConfig = {
             apiKey: "AIzaSyD4AIwE7b1wCUAqgQKqTzYhTWZ1suEoL8Y",
             authDomain: "itself-3c41c.firebaseapp.com",
@@ -185,46 +176,27 @@
     firebase.initializeApp(firebaseConfig);
 
     const database = firebase.database();
-    // Reference to the acceptedRequests node
     const requestsRef = database.ref('acceptedRequests');
 
-      // Listen for new accepted requests
       requestsRef.on('child_added', (snapshot) => {
         const requestData = snapshot.val();
         const requestKey = snapshot.key;
-
-        console.log("requestKey:", requestKey);
-        // Call function to update UI
         updateAcceptedRequestsUI(requestData);
     });
 
-    // Listen for changes in existing requests
     requestsRef.on('child_changed', (snapshot) => {
         const updatedData = snapshot.val();
-        console.log("Updated Request:", updatedData);
-
-        // Update the specific request in UI
         updateAcceptedRequestsUI(updatedData);
     
     });
 
-    // requestsRef.orderByChild('timestamp').limitToLast(1).on('child_added', (snapshot) => {
-    //     const latestRequest = snapshot.val();
-    //     updateAcceptedRequestsUI(latestRequest);
-    // })
- 
     function updateAcceptedRequestsUI(data) {
+        let requestsRow = document.querySelector("#requests-row");
+        let cardWrapper = document.createElement("div");
+        cardWrapper.classList.add("col-md-4");
 
-        console.log("data1::", data);
-
-        let container = document.querySelector("#accepted-requests-container");
-
-        let card = document.createElement("div");
-        card.classList.add("col-md-3");
-      
-        card.innerHTML = `
-        
-             <div class="card card-post card-round" style="border-top: 3px solid #6861ce;">
+        cardWrapper.innerHTML = `
+            <div class="card card-post card-round" style="border-top: 3px solid #6861ce;">
                 <div class="card-body">
                     <div class="d-flex">
                         <div class="avatar">
@@ -236,29 +208,28 @@
                         </div>
                     </div>
                     <div class="separator-solid"></div>
-                    <p class="card-category text-info mb-1">
-                        <a>${new Date(data.timestamp).toLocaleString()}</a>
-                    </p>
+                        <p class="card-category text-info mb-1">
+                            <a>${new Date(data.timestamp).toLocaleString()}</a>
+                        </p>
                     <h3 class="card-title">
                         <a>${data.request_code}</a>
                     </h3>
                     <div>
                         <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
-                         <ul id="request-list"></ul>
+                        <ul id="request-list"></ul>
                     </div>
-                    <div class="card-footer text-center bubble-shadow" style="background-color: #6861ce; color: white; padding: 10px;">
-                      <strong>${data.tech_name} is on the way</strong>
-                    </div>
+                    
+                </div>
+                <div class="card-footer text-center bubble-shadow w-100" style="background-color: #6861ce; color: white; padding: 10px;">
+                    <strong>${data.tech_name} is on the way</strong>
                 </div>
             </div>
-
         `;
-
-        // Find the placeholder UL element
-        let ul = card.querySelector("#request-list");
+         requestsRow.appendChild(cardWrapper);
+        
+        let ul = cardWrapper.querySelector("#request-list");
         
         if(data.description){
-            // Process the description and append <li> items
             const description = data.description.split(',').map(item => item.trim());
             
             description.forEach((task, index) => {
@@ -269,8 +240,9 @@
                 } else if (index === 0 || description[index - 1] !== "Others") {
                     li.innerHTML = `<label>${task}</label>`;
                 }
-
-                ul.appendChild(li);
+                if (li.innerHTML !== "") {
+                    ul.appendChild(li);
+                }
             });
 
         }else{
@@ -278,11 +250,6 @@
             li.innerHTML = "<label>No description available</label>";
             ul.appendChild(li);
         }
-        
-
-        // Append the card to the container
-        container.appendChild(card);
-
     }
 
     document.addEventListener('DOMContentLoaded', function() {
