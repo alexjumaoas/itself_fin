@@ -71,16 +71,16 @@ class JobRequestController extends Controller
         return redirect()->route('requestForm')->with('success', 'Request submitted successfully!');
     }
 
-  public function cancelRequest(Request $req, $id){
-       $user = $req->get('currentUser');
- 
-        $act_req = new Activity_request();
-        $act_req->job_request_id = $id;
-        $act_req->request_code = $req->req_code;
-        $act_req->tech_from = $user->userid;
-        $act_req->status = "cancelled";
-        $act_req->remarks = $req->cancelRemarks;
-        $act_req->save();
-        return redirect()->route('currentRequest')->with('success', 'successfully cancelled request!');
-  }
+    public function cancelRequest(Request $req, $id){
+        $user = $req->get('currentUser');
+    
+            $act_req = new Activity_request();
+            $act_req->job_request_id = $id;
+            $act_req->request_code = $req->req_code;
+            $act_req->tech_from = $user->userid;
+            $act_req->status = "cancelled";
+            $act_req->remarks = $req->cancelRemarks;
+            $act_req->save();
+            return redirect()->route('currentRequest')->with('success', 'successfully cancelled request!');
+    }
 }
