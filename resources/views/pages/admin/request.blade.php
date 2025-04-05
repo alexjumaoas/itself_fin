@@ -13,6 +13,9 @@ use App\Models\Dtruser;
     @php
         $firstEnabled = true; // Enable only the first pending job
     @endphp
+    <div class="row" id="pending-requests-container">
+        <!-- Real-time pending cards will appear here -->
+    </div>
     @forelse($job_pending as $pending)
         @php
             $user = App\Models\Dtruser::where('username', $pending->tech_from)->first();
@@ -21,6 +24,7 @@ use App\Models\Dtruser;
         @if($pending->status == "transferred" && (int) $userInfo->username === $pending->tech_from)
 
         @else
+        
             <div class="col-md-3">
                 <div class="card card-post card-round" style="border-top: 3px solid #f25961;">
                     <div class="card-body">
@@ -379,35 +383,30 @@ use App\Models\Dtruser;
     const database = firebase.database();
     // Reference to the acceptedRequests node
     const requestsRef = database.ref('acceptedRequests');
+  
+        // Listen for new accepted requests
+        requestsRef.on('child_added', (snapshot) => {
+            const requestData = snapshot.val();
+            const requestKey = snapshot.key;
 
-      // Listen for new accepted requests
-      requestsRef.on('child_added', (snapshot) => {
-        const requestData = snapshot.val();
-        const requestKey = snapshot.key;
+            console.log("requestKey:", requestKey);
 
-        console.log("requestKey:", requestKey);
+            // Call function to update UI
+            updateAcceptedRequestsUI(requestData);
+            setTimeout(() => {
+                deleteaccepted(requestKey);
+            }, 2000);
+        });
 
-        // Call function to update UI
-        updateAcceptedRequestsUI(requestData);
-        setTimeout(() => {
-            deleteaccepted(requestKey);
-        }, 2000);
-    });
-
-    // Listen for changes in existing requests
-    requestsRef.on('child_changed', (snapshot) => {
-        const updatedData = snapshot.val();
-        console.log("Updated Request:", updatedData);
+        // Listen for changes in existing requests
+        requestsRef.on('child_changed', (snapshot) => {
+            const updatedData = snapshot.val();
+            console.log("Updated Request:", updatedData);
+            
+            // Update the specific request in UI
+            updateAcceptedRequestsUI(updatedData);
         
-        // Update the specific request in UI
-        updateAcceptedRequestsUI(updatedData);
-    
-    });
-
-    // requestsRef.orderByChild('timestamp').limitToLast(1).on('child_added', (snapshot) => {
-    //     const latestRequest = snapshot.val();
-    //     updateAcceptedRequestsUI(latestRequest);
-    // })
+        });
 
     function updateAcceptedRequestsUI(data) {
 
@@ -489,7 +488,174 @@ use App\Models\Dtruser;
             console.log("Request successfully deleted");
         })
         .catch((error) => {
-            console.log("error");
+            console.log("error deleting request firebase");
+        })
+    }
+
+    //pending Request
+
+    const pendingRequestsRef = database.ref('pendingRequests');
+        
+    pendingRequestsRef.on('child_added', (snapshot) => {
+        const requestData = snapshot.val();
+        const requestKey = snapshot.key;
+
+        console.log("pending requestKey:", requestData);
+
+        // Call function to update UI
+        updatePendingRequestsUI(requestData,requestKey);
+        setTimeout(() => {
+            deletePending(requestKey);
+        }, 2000);
+    });
+
+    // Listen for changes in existing requests
+    pendingRequestsRef.on('child_changed', (snapshot) => {
+        const updatedData = snapshot.val();
+        const requestKey = snapshot.key;
+
+        document.querySelector(`#pending-${requestKey}`)?.remove();
+        
+        // Update the specific request in UI
+        updatePendingRequestsUI(updatedData,requestKey);
+    
+    });
+
+    function updatePendingRequestsUI(pendingData,requestKey){
+        
+        let container = document.querySelector("#pending-requests-container");
+
+        let card = document.createElement("div");
+        card.classList.add("col-md-3");
+        card.id = `pending-${requestKey}`;
+
+        const taskItems = pendingData.description.split(',').map(task => `<li><label>${task.trim()}</label></li>`).join('');
+        card.innerHTML = `
+
+            <div class="card card-post card-round" style="border-top: 3px solid #f25961;">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="avatar">
+                        <img src="/assets/img/profile2.jpg" alt="..." class="avatar-img rounded-circle">
+                    </div>
+                    <div class="info-post ms-2">
+                        <p class="username">${pendingData.requester_name}</p>
+                        <p class="date text-muted">${pendingData.section} Section, ${pendingData.division}</p>
+                    </div>
+                </div>
+                <div class="separator-solid"></div>
+                <p class="card-category text-info mb-1">
+                    <a>${new Date().toLocaleString()}</a>
+                </p>
+                <h3 class="card-title">
+                    <a>${pendingData.request_code}</a>
+                </h3>
+                <div>
+                    <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
+                    <ul>${taskItems}</ul>
+                </div>
+                <button class="btn btn-danger w-100 bubble-shadow" onclick="handleAccept('${requestKey}','${pendingData.job_request_id}', '${pendingData.request_code}','${pendingData.requester_name}')">
+                    Accept
+                </button>
+            </div>
+        </div>
+
+        `;
+       container.prepend(card);
+    }
+
+    function handleAccept(requestKey, job_id, code, fullname) {
+    if (!job_id && !code) {
+        console.error("job id and code is missing");
+        return;
+    }
+
+    fetch(`/technician/${job_id}/${code}/accept`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'X-Requested-With': 'XMLHttpRequest' // This helps Laravel detect AJAX
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                console.error("Server response:", text);
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("accepted data now", data);
+        if (data.success) {
+            // Show success message
+            swal({
+                title: "Success!",
+                text: `Request from ${data.fullname} is accepted`,
+                icon: "success",
+                button: "OK",
+                timer: 5000
+            });
+
+            // Remove the request from the UI
+            document.querySelector(`#pending-${requestKey}`)?.remove();
+            
+            // Handle Firebase data
+            if (data.firebaseData) {
+                // Get reference to the Firebase database
+                const database = firebase.database();
+                
+                // Create a reference for the accepted requests
+                const requestsRef = database.ref('acceptedRequests');
+                
+                // Generate a new key for this request
+                const newRequestRef = requestsRef.push();
+                
+                // Save the data to Firebase
+                newRequestRef.set(data.firebaseData)
+                    .then(() => {
+                        console.log('Request saved to Firebase successfully');
+                    })
+                    .catch((error) => {
+                        console.error('Error saving to Firebase:', error);
+                    });
+            }
+            
+            console.log('ajax data',data.firebaseData);
+
+        } else {
+            swal({
+                title: "Error!",
+                text: data.message || "Failed to accept request",
+                icon: "error",
+                button: "OK"
+            });
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        swal({
+            title: "Error!",
+            text: "Something went wrong. Please try again.",
+            icon: "error",
+            button: "OK"
+        });
+    });
+}
+
+    function deletePending(pendingkey){
+
+        console.log("pending key", pendingkey);
+
+        pendingRequestsRef.child(pendingkey).remove()
+        .then(() => {
+            console.log("Pending Request successfully deleted");
+        })
+        .catch((erro) =>{
+            console.log("error deleting pending request firebase");
         })
     }
 

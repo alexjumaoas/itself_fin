@@ -139,7 +139,7 @@
                 icon: "success",
                 button: "OK", // OK button
             }).then(function() {
-                window.location = "{{ route('currentRequest') }}"; // Redirect to currentRequest after OK
+                // window.location = "{{ route('currentRequest') }}"; // Redirect to currentRequest after OK
             });
         });
     </script>

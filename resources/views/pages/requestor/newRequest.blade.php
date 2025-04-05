@@ -184,7 +184,6 @@
         
     firebase.initializeApp(firebaseConfig);
 
-
     const database = firebase.database();
     // Reference to the acceptedRequests node
     const requestsRef = database.ref('acceptedRequests');
@@ -286,7 +285,43 @@
 
     }
 
+    document.addEventListener('DOMContentLoaded', function() {
 
+        const PendingData = @json(session('PendingData'));
+            
+        if(PendingData){
+
+            swal({
+                title: "Success!",
+                text: "{{ session('success') }}",
+                icon: "success",
+                button: "OK", // OK button
+            }).then(function() {
+                // window.location = "{{ route('currentRequest') }}"; // Redirect to currentRequest after OK
+            });
+
+                // Get reference to the Firebase database
+            const database = firebase.database();
+            
+            // Create a reference for the accepted requests
+            const requestsRef = database.ref('pendingRequests');
+            
+            // Generate a new key for this request
+            const newRequestRef = requestsRef.push();
+            console.log("my pending data", PendingData);
+            // Save the data to Firebase
+            newRequestRef.set(PendingData)
+                .then(() => {
+                    console.log('Request pending saved to Firebase successfully');
+                })
+                .catch((error) => {
+                    console.error('Error saving to Firebase:', error);
+                });
+        }else{
+            console.log("no data request job");
+        }
+           
+    });
 
 </script>
 

@@ -68,7 +68,23 @@ class JobRequestController extends Controller
         $activity->status = "pending";
         $activity->save();
 
-        return redirect()->route('requestForm')->with('success', 'Request submitted successfully!');
+        $activityRequest = Activity_request::with(['job_req.requester.sectionRel', 'job_req.requester.divisionRel'])
+        ->where('id', $activity->id)
+        ->first();
+
+        return redirect()->route('currentRequest')
+        ->with('success', 'Successfully created request!')
+        ->with('PendingData', [
+            'request_code' =>  $request_it->request_code,
+            'request_date' => $request_it->request_date,
+            'job_request_id' => $request_it->id,
+            'description' => $request_it->description,
+            'requester_name' => optional($activityRequest->job_req->requester)->fname . ' ' . optional($activityRequest->job_req->requester)->lname,
+            'section' => $activityRequest->job_req->requester->sectionRel->acronym,
+            'division' => $activityRequest->job_req->requester->divisionRel->description,
+            'timestamp' => Carbon::now()->toIso8601String(),
+            'status' => 'pending'
+        ]);
     }
 
   public function cancelRequest(Request $req, $id){
