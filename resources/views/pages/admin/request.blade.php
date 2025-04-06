@@ -374,25 +374,17 @@ use App\Models\Dtruser;
 
     const requestsRef = database.ref('acceptedRequests');
   
-        // Listen for new accepted requests
-        requestsRef.on('child_added', (snapshot) => {
-            const requestData = snapshot.val();
-            const requestKey = snapshot.key;
+    // Listen for new accepted requests
+    requestsRef.on('child_added', (snapshot) => {
+        const requestData = snapshot.val();
+        const requestKey = snapshot.key;
 
-        requestsRef.on('child_added', (snapshot) => {
-            const requestData = snapshot.val();
-            const requestKey = snapshot.key;
+        console.log("requestKey:", requestKey);
 
-        requestsRef.on('child_added', (snapshot) => {
-            const requestData = snapshot.val();
-            const requestKey = snapshot.key;
-
-            console.log("requestKey:", requestKey);
-
-            updateAcceptedRequestsUI(requestData);
-            setTimeout(() => {
-                deleteaccepted(requestKey);
-            }, 2000);
+        updateAcceptedRequestsUI(requestData);
+        setTimeout(() => {
+            deleteaccepted(requestKey);
+        }, 2000);
     });
 
     requestsRef.on('child_changed', (snapshot) => {
@@ -514,7 +506,10 @@ use App\Models\Dtruser;
 
         let card = document.createElement("div");
         card.classList.add("col-md-3");
-        card.id = `pending-${requestKey}`;
+        // card.id = `pending${requestKey}`;
+        // card.id = `pending${requestKey.replace(/^[-]+/, '')}`;
+        const modifiedKey = requestKey.replace(/^[-]+/, '');
+        card.id = `pending${modifiedKey}`;
 
         const taskItems = pendingData.description.split(',').map(task => `<li><label>${task.trim()}</label></li>`).join('');
         card.innerHTML = `
@@ -541,7 +536,7 @@ use App\Models\Dtruser;
                     <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
                     <ul>${taskItems}</ul>
                 </div>
-                <button class="btn btn-danger w-100 bubble-shadow" onclick="handleAccept('${requestKey}','${pendingData.job_request_id}', '${pendingData.request_code}','${pendingData.requester_name}')">
+                <button class="btn btn-danger w-100 bubble-shadow" onclick="handleAccept('${modifiedKey}','${pendingData.job_request_id}', '${pendingData.request_code}','${pendingData.requester_name}')">
                     Accept
                 </button>
             </div>
@@ -552,86 +547,88 @@ use App\Models\Dtruser;
     }
 
     function handleAccept(requestKey, job_id, code, fullname) {
-    if (!job_id && !code) {
-        console.error("job id and code is missing");
-        return;
-    }
-
-    fetch(`/technician/${job_id}/${code}/accept`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            'X-Requested-With': 'XMLHttpRequest' // This helps Laravel detect AJAX
-        },
-        body: JSON.stringify({})
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.text().then(text => {
-                console.error("Server response:", text);
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            });
+        if (!job_id && !code) {
+            console.error("job id and code is missing");
+            return;
         }
-        return response.json();
-    })
-    .then(data => {
-        console.log("accepted data now", data);
-        if (data.success) {
-            // Show success message
-            swal({
-                title: "Success!",
-                text: `Request from ${data.fullname} is accepted`,
-                icon: "success",
-                button: "OK",
-                timer: 5000
-            });
 
-            // Remove the request from the UI
-            document.querySelector(`#pending-${requestKey}`)?.remove();
-            
-            // Handle Firebase data
-            if (data.firebaseData) {
-                // Get reference to the Firebase database
-                const database = firebase.database();
-                
-                // Create a reference for the accepted requests
-                const requestsRef = database.ref('acceptedRequests');
-                
-                // Generate a new key for this request
-                const newRequestRef = requestsRef.push();
-                
-                // Save the data to Firebase
-                newRequestRef.set(data.firebaseData)
-                    .then(() => {
-                        console.log('Request saved to Firebase successfully');
-                    })
-                    .catch((error) => {
-                        console.error('Error saving to Firebase:', error);
-                    });
+        fetch(`/technician/${job_id}/${code}/accept`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'X-Requested-With': 'XMLHttpRequest' // This helps Laravel detect AJAX
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    console.error("Server response:", text);
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                });
             }
-            
-            console.log('ajax data',data.firebaseData);
+            return response.json();
+        })
+        .then(data => {
+            console.log("accepted data now", data);
+            if (data.success) {
+                // Show success message
+                swal({
+                    title: "Success!",
+                    text: `Request from ${data.fullname} is accepted`,
+                    icon: "success",
+                    button: "OK",
+                    timer: 5000
+                });
+                console.log("Setting card ID:", `pending${requestKey}`);
+                // Remove the request from the UI
+                let modifiedKey = requestKey.replace(/^[-]+/, '');
+                let requestedCard = document.getElementById(`pending${modifiedKey}`);
+                requestedCard.remove();
+                
+                // Handle Firebase data
+                if (data.firebaseData) {
+                    // Get reference to the Firebase database
+                    const database = firebase.database();
+                    
+                    // Create a reference for the accepted requests
+                    const requestsRef = database.ref('acceptedRequests');
+                    
+                    // Generate a new key for this request
+                    const newRequestRef = requestsRef.push();
+                    
+                    // Save the data to Firebase
+                    newRequestRef.set(data.firebaseData)
+                        .then(() => {
+                            console.log('Request saved to Firebase successfully');
+                        })
+                        .catch((error) => {
+                            console.error('Error saving to Firebase:', error);
+                        });
+                }
+                
+                console.log('ajax data',data.firebaseData);
 
-        } else {
+            } else {
+                swal({
+                    title: "Error!",
+                    text: data.message || "Failed to accept request",
+                    icon: "error",
+                    button: "OK"
+                });
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
             swal({
                 title: "Error!",
-                text: data.message || "Failed to accept request",
+                text: "Something went wrong. Please try again.",
                 icon: "error",
                 button: "OK"
             });
-        }
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        swal({
-            title: "Error!",
-            text: "Something went wrong. Please try again.",
-            icon: "error",
-            button: "OK"
         });
-    });
-}
+    }
 
     function deletePending(pendingkey){
 
@@ -645,6 +642,7 @@ use App\Models\Dtruser;
             console.log("error deleting pending request firebase");
         })
     }
+
 </script>
 
 @endsection
