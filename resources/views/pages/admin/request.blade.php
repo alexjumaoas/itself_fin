@@ -502,6 +502,19 @@ use App\Models\Dtruser;
 
     function updatePendingRequestsUI(pendingData,requestKey){
         
+        $.ajax({
+            url:"{{ route('requestor.isaccepted') }}",
+            type:'GET',
+            data:{code: pendingData.request_code},
+            dataType: 'json',
+            success: function(response) {
+                console.log('Success: code send', response);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+            }
+        });
+
         let container = document.querySelector("#pending-requests-container");
 
         let card = document.createElement("div");
@@ -572,6 +585,7 @@ use App\Models\Dtruser;
         })
         .then(data => {
             console.log("accepted data now", data);
+            
             if (data.success) {
                 // Show success message
                 swal({

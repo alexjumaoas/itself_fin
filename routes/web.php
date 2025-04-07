@@ -43,6 +43,9 @@ Route::middleware(['check.user.type:1', 'load.user.data'])->group(function () {
     
     Route::Post('/technician/transfer', [TechnicianController::class, 'Transfer'])->name('technician.transfer');
     Route::Post('technician/done', [TechnicianController::class, 'done'])->name('technician.done');
+
+    Route::get('requestor/isAccepted', [TechnicianController::class, 'isAccepted'])->name('requestor.isaccepted');
+
     
     // Route::get('/technician/request', [TechnicianController::class, 'requestor'])->name('technician.request');
     // Route::get('/technician/finished', function () {
