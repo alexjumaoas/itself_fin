@@ -4,6 +4,8 @@ use App\Http\Controllers\TechnicianController;
 use App\Http\Controllers\LoginUserController;
 use App\http\Controllers\JobRequestController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PDFController;
+use App\Http\Controllers\ExcelReportController;
 
 //for login user
 Route::get('/', function () {
@@ -40,13 +42,13 @@ Route::middleware(['check.user.type:1', 'load.user.data'])->group(function () {
     Route::Post('/technician/{job}/{code}/accept', [TechnicianController::class, 'acceptRequest'])->name('technician.accept');
     Route::get('/technician/request', [TechnicianController::class, 'requestor'])->name('technician.request');
     Route::get('/technician/finished', [TechnicianController::class, 'finished'])->name('technician.finished');
-    
+
     Route::Post('/technician/transfer', [TechnicianController::class, 'Transfer'])->name('technician.transfer');
     Route::Post('technician/done', [TechnicianController::class, 'done'])->name('technician.done');
 
     Route::get('requestor/isAccepted', [TechnicianController::class, 'isAccepted'])->name('requestor.isaccepted');
 
-    
+
     // Route::get('/technician/request', [TechnicianController::class, 'requestor'])->name('technician.request');
     // Route::get('/technician/finished', function () {
     //     return view('pages.admin.finished');
@@ -54,3 +56,5 @@ Route::middleware(['check.user.type:1', 'load.user.data'])->group(function () {
 
 });
 
+Route::get('/generate-pdf', [PDFController::class, 'generatePDF'])->name('generate.pdf');
+Route::get('/generate-excel', [ExcelReportController::class, 'generateExcel'])->name('generate.excel');

@@ -75,6 +75,17 @@
     border-color: #ebedf2 !important;
     opacity: 1 !important;
 }
+
+a.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
+}
+
 </style>
 
 <h3 class="fw-bold mb-3">REPORTS</h3>
@@ -120,23 +131,18 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header" style="background-color: #5867dd;">
-                        <div class="card-title" style="color: white;">Genarate Report</div>
+                        <div class="card-title" style="color: white;">Generate Report</div>
                     </div>
                     <div class="card-body">
-                        <!-- <div class="form-group">
-                            <label for="startMonth">Start Month</label>
-                            <input type="text" class="form-control" id="startMonth" placeholder="Start Month">
-                        </div>
-                        <div class="form-group">
-                            <label for="endMonth">End Month</label>
-                            <input type="text" class="form-control" id="endMonth" placeholder="End Month">
-                        </div> -->
                         <div class="form-group">
                             <label for="dateGenerate">Date Range</label>
                             <input type="text" class="form-control" id="dateGenerate" placeholder="Select Date Range">
                         </div>
                         <div class="form-group text-center">
-                            <button class="btn btn-secondary w-100">Generate</button>
+                            {{-- <button class="btn btn-secondary w-100">Generate</button> --}}
+                            <a href="{{ route('generate.excel') }}" class="btn btn-secondary w-100">
+                                Generate Excel
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -156,7 +162,6 @@
                             <div class="box bubble-shadow">
                                 <div class="header">
                                     <div class="part_one"><p style="margin-left: 8px; margin-top: 4px; color: white; font-size: 18px;">
-                                        <!-- {{ \Carbon\Carbon::parse($completed->created_at)->format('F j, Y') }} -->
                                           2025-001
                                     </p></div>
                                     <div class="part_two"></div>
@@ -170,6 +175,12 @@
                                     <div class="op-8">Ended: {{ \Carbon\Carbon::parse($completed->request_history->completion_date)->format('h:i:s A') }}</div> --}}
                                     <div class="mt-5">
                                         <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#jobModal{{$completed->id}}">Show Request</button>
+                                        <a href="{{ route('generate.pdf') }}" target="_blank" class="btn btn-sm btn-success">
+                                            {{-- <button type="button" class="btn btn-sm btn-success"> --}}
+                                                <i class="fas fa-file-pdf" style="font-size: 16px;"></i>
+                                            {{-- </button> --}}
+                                        </a>
+
                                     </div>
                                 </div>
                             </div>
