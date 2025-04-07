@@ -585,53 +585,61 @@ use App\Models\Dtruser;
         })
         .then(data => {
             console.log("accepted data now", data);
-            
-            if (data.success) {
-                // Show success message
+               // Remove the request from the UI
+               let modifiedKey = requestKey.replace(/^[-]+/, '');
+               let requestedCard = document.getElementById(`pending${modifiedKey}`);
+            if(data.isAccepted === 1){
                 swal({
-                    title: "Success!",
-                    text: `Request from ${data.fullname} is accepted`,
-                    icon: "success",
-                    button: "OK",
-                    timer: 5000
-                });
-                console.log("Setting card ID:", `pending${requestKey}`);
-                // Remove the request from the UI
-                let modifiedKey = requestKey.replace(/^[-]+/, '');
-                let requestedCard = document.getElementById(`pending${modifiedKey}`);
-                requestedCard.remove();
-                
-                // Handle Firebase data
-                if (data.firebaseData) {
-                    // Get reference to the Firebase database
-                    const database = firebase.database();
+                        title: "Error!",
+                        text: "This Pending Request is Already accepted by other technician!",
+                        icon: "error",
+                        button: "OK"
+                    });
+                    requestedCard.remove();
+            }else{
+                if (data.success) {
+                    // Show success message
+                    swal({
+                        title: "Success!",
+                        text: `Request from ${data.fullname} is accepted`,
+                        icon: "success",
+                        button: "OK",
+                        timer: 5000
+                    });
+                    requestedCard.remove();
                     
-                    // Create a reference for the accepted requests
-                    const requestsRef = database.ref('acceptedRequests');
+                    // Handle Firebase data
+                    if (data.firebaseData) {
+                        // Get reference to the Firebase database
+                        const database = firebase.database();
+                        
+                        // Create a reference for the accepted requests
+                        const requestsRef = database.ref('acceptedRequests');
+                        
+                        // Generate a new key for this request
+                        const newRequestRef = requestsRef.push();
+                        
+                        // Save the data to Firebase
+                        newRequestRef.set(data.firebaseData)
+                            .then(() => {
+                                console.log('Request saved to Firebase successfully');
+                            })
+                            .catch((error) => {
+                                console.error('Error saving to Firebase:', error);
+                            });
+                    }
                     
-                    // Generate a new key for this request
-                    const newRequestRef = requestsRef.push();
-                    
-                    // Save the data to Firebase
-                    newRequestRef.set(data.firebaseData)
-                        .then(() => {
-                            console.log('Request saved to Firebase successfully');
-                        })
-                        .catch((error) => {
-                            console.error('Error saving to Firebase:', error);
-                        });
+                    console.log('ajax data',data.firebaseData);
+                } else {
+                    swal({
+                        title: "Error!",
+                        text: data.message || "Failed to accept request",
+                        icon: "error",
+                        button: "OK"
+                    });
                 }
-                
-                console.log('ajax data',data.firebaseData);
-
-            } else {
-                swal({
-                    title: "Error!",
-                    text: data.message || "Failed to accept request",
-                    icon: "error",
-                    button: "OK"
-                });
             }
+         
         })
         .catch(error => {
             console.error("Error:", error);

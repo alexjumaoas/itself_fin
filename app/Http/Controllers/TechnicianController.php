@@ -80,8 +80,6 @@ class TechnicianController extends Controller
             $hasaccepted = $latestaccepted ? 1 : 0;
       
             $user = $req->get('currentUser');
-            $activityRequest = null;
-            $job_req = null;
             if($hasaccepted === 0){
 
                 $act_req = new Activity_request();
@@ -113,26 +111,32 @@ class TechnicianController extends Controller
                 session()->flash('success', 'Successfully accepted request!');
                 session()->flash('firebaseData', $firebaseData);
 
+                if ($req->ajax() || $req->wantsJson()) {
+                    try {
+                        
+                    return response()->json([
+                            'success' => true,
+                            'fullname' => $activityRequest->job_req->requester->fname . ' ' . $activityRequest->job_req->requester->lname,
+                            'message' => 'Successfully accepted request!',
+                            'firebaseData' => $firebaseData,
+                            'isAccepted' =>  $hasaccepted 
+                        ]);
+                    } catch (\Exception $e) {
+                        // Return JSON error response
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Error: ' . $e->getMessage()
+                        ], 500);
+                    }
+                }
+
+            }else{
+                return response()->json([
+                    'success' => true,
+                    'isAccepted' =>  $hasaccepted 
+                ]);
             }   
 
-            if ($req->ajax() || $req->wantsJson()) {
-                try {
-                    
-                return response()->json([
-                        'success' => true,
-                        'fullname' => $activityRequest->job_req->requester->fname . ' ' . $activityRequest->job_req->requester->lname,
-                        'message' => 'Successfully accepted request!',
-                        'firebaseData' => $firebaseData,
-                        'isAccepted' =>  $hasaccepted 
-                    ]);
-                } catch (\Exception $e) {
-                    // Return JSON error response
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Error: ' . $e->getMessage()
-                    ], 500);
-                }
-            }
 
             return redirect()->route('technician.request');
 
