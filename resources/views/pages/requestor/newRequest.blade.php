@@ -8,7 +8,7 @@
             <h3 class="fw-bold">CURRENT REQUEST(S)</h3>
         </div>
         @forelse($activity_reqs as $pending)
-            <div class="col-md-4">
+            <div class="col-md-4" id="requestor{{$pending->request_code}}">
                 <div class="card card-post card-round" style="border-top: 3px solid #f25961;">
                     <div class="card-body">
                         <div class="d-flex">

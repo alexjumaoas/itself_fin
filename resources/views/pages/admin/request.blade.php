@@ -111,7 +111,7 @@ use App\Models\Dtruser;
         @endif
     @empty
         <!-- FOR ONGOING REQUEST, IF EMPTY OR NOT -->
-        <div class="col-sm-6 col-md-12">
+        <div class="col-sm-6 col-md-12" id="pendingrequestEmpty">
             <div class="card card-stats card-round" style="background-color: #B8E7BA;">
                 <div class="card-body">
                     <div class="row">
@@ -526,37 +526,36 @@ use App\Models\Dtruser;
 
         const taskItems = pendingData.description.split(',').map(task => `<li><label>${task.trim()}</label></li>`).join('');
         card.innerHTML = `
-
             <div class="card card-post card-round" style="border-top: 3px solid #f25961;">
-            <div class="card-body">
-                <div class="d-flex">
-                    <div class="avatar">
-                        <img src="/assets/img/profile2.jpg" alt="..." class="avatar-img rounded-circle">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="avatar">
+                            <img src="/assets/img/profile2.jpg" alt="..." class="avatar-img rounded-circle">
+                        </div>
+                        <div class="info-post ms-2">
+                            <p class="username">${pendingData.requester_name}</p>
+                            <p class="date text-muted">${pendingData.section} Section, ${pendingData.division}</p>
+                        </div>
                     </div>
-                    <div class="info-post ms-2">
-                        <p class="username">${pendingData.requester_name}</p>
-                        <p class="date text-muted">${pendingData.section} Section, ${pendingData.division}</p>
+                    <div class="separator-solid"></div>
+                    <p class="card-category text-info mb-1">
+                        <a>${new Date().toLocaleString()}</a>
+                    </p>
+                    <h3 class="card-title">
+                        <a>${pendingData.request_code}</a>
+                    </h3>
+                    <div>
+                        <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
+                        <ul>${taskItems}</ul>
                     </div>
+                    <button class="btn btn-danger w-100 bubble-shadow" onclick="handleAccept('${modifiedKey}','${pendingData.job_request_id}', '${pendingData.request_code}','${pendingData.requester_name}')">
+                        Accept
+                    </button>
                 </div>
-                <div class="separator-solid"></div>
-                <p class="card-category text-info mb-1">
-                    <a>${new Date().toLocaleString()}</a>
-                </p>
-                <h3 class="card-title">
-                    <a>${pendingData.request_code}</a>
-                </h3>
-                <div>
-                    <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
-                    <ul>${taskItems}</ul>
-                </div>
-                <button class="btn btn-danger w-100 bubble-shadow" onclick="handleAccept('${modifiedKey}','${pendingData.job_request_id}', '${pendingData.request_code}','${pendingData.requester_name}')">
-                    Accept
-                </button>
             </div>
-        </div>
-
         `;
        container.prepend(card);
+       $('#pendingrequestEmpty').remove();
     }
 
     function handleAccept(requestKey, job_id, code, fullname) {
@@ -570,7 +569,7 @@ use App\Models\Dtruser;
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'X-Requested-With': 'XMLHttpRequest' // This helps Laravel detect AJAX
+                'X-Requested-With': 'XMLHttpRequest' 
             },
             body: JSON.stringify({})
         })
@@ -588,6 +587,8 @@ use App\Models\Dtruser;
                // Remove the request from the UI
                let modifiedKey = requestKey.replace(/^[-]+/, '');
                let requestedCard = document.getElementById(`pending${modifiedKey}`);
+               let requestorcode = document.getElementById(`requestor${code}`);
+               console.log("requestorcode", requestorcode);
             if(data.isAccepted === 1){
                 swal({
                         title: "Error!",
@@ -598,7 +599,6 @@ use App\Models\Dtruser;
                     requestedCard.remove();
             }else{
                 if (data.success) {
-                    // Show success message
                     swal({
                         title: "Success!",
                         text: `Request from ${data.fullname} is accepted`,
@@ -607,27 +607,29 @@ use App\Models\Dtruser;
                         timer: 5000
                     });
                     requestedCard.remove();
-                    
-                    // Handle Firebase data
-                    if (data.firebaseData) {
-                        // Get reference to the Firebase database
-                        const database = firebase.database();
-                        
-                        // Create a reference for the accepted requests
-                        const requestsRef = database.ref('acceptedRequests');
-                        
-                        // Generate a new key for this request
-                        const newRequestRef = requestsRef.push();
-                        
-                        // Save the data to Firebase
-                        newRequestRef.set(data.firebaseData)
-                            .then(() => {
-                                console.log('Request saved to Firebase successfully');
-                            })
-                            .catch((error) => {
-                                console.error('Error saving to Firebase:', error);
-                            });
+                    if (requestorcode) {
+                        requestorcode.remove();
                     }
+
+                    console.log("requestorcode::", requestorcode);
+                    location.reload();
+                    // if (data.firebaseData) {
+         
+                    //     const database = firebase.database();
+                        
+                    //     const requestsRef = database.ref('acceptedRequests');
+                        
+                    //     const newRequestRef = requestsRef.push();
+                        
+                    //     newRequestRef.set(data.firebaseData)
+                    //         .then(() => {
+                    //             console.log('Request saved to Firebase successfully');
+                    //         })
+                    //         .catch((error) => {
+                    //             console.error('Error saving to Firebase:', error);
+                    //         });
+
+                    // }
                     
                     console.log('ajax data',data.firebaseData);
                 } else {
