@@ -186,8 +186,32 @@ class TechnicianController extends Controller
         $tranferred->remarks = $req->transferReason;
         $tranferred->status = "transferred";
         $tranferred->save();
+        
+        $job_req = Job_request::where('request_code', $req->code)->first();
+        $activity = Activity_request::with(['job_req.requester.sectionRel', 'job_req.requester.divisionRel'])
+                ->where('id', $tranferred->id)
+                ->where('status', 'transferred')
+                ->first();
 
-        return Redirect::back()->with('success', 'Request is successfuly transferred');
+        $transferredData = [
+            'request_code' => $req->code,
+            'tech_name' => $user->fname . ' ' . $user->lname,
+            'tech_to' => $activity->tech_to,
+            'description' => $job_req->description,
+            'requester_name' => $activity->job_req->requester->fname . ' ' . $activity->job_req->requester->lname,
+            'section' => $activity->job_req->requester->sectionRel->acronym,
+            'division' => $activity->job_req->requester->divisionRel->description,
+            'timestamp' => Carbon::now()->toIso8601String(),
+            'status' => 'transferred'
+        ];
+    
+        // session()->flash('success', 'Successfully accepted request!');
+        // session()->flash('transferredData', $transferredData);
+
+        return Redirect::back()->with([
+            'success' => 'Request is successfuly transferred',
+            'transferredData' => $transferredData
+        ]);
     }
 
     public function isAccepted(Request $req){

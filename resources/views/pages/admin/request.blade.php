@@ -362,6 +362,19 @@ use App\Models\Dtruser;
                 .catch((error) => {
                     console.error('Error saving to Firebase:', error);
             });
+
+
+            const TransData = @json(session('transferredData'));
+            const requestsRef = database.ref('TransferData');
+            const TransRequestRef = requestsRef.push();
+
+            TransRequestRef.set(TransData)
+                .then(() => {
+                    console.log('Request saved to Firebase successfully');
+                })
+                .catch((error) => {
+                    console.error('Error saving to Firebase:', error);
+            });
         });
 
     </script>
@@ -587,8 +600,7 @@ use App\Models\Dtruser;
                // Remove the request from the UI
                let modifiedKey = requestKey.replace(/^[-]+/, '');
                let requestedCard = document.getElementById(`pending${modifiedKey}`);
-               let requestorcode = document.getElementById(`requestor${code}`);
-               console.log("requestorcode", requestorcode);
+           
             if(data.isAccepted === 1){
                 swal({
                         title: "Error!",
