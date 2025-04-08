@@ -57,7 +57,7 @@
             </div>
         @empty
             <!-- FOR CURRENT REQUEST, IF EMPTY OR NOT -->
-            <div class="col-sm-6 col-md-12">
+            <div class="col-sm-6 col-md-12" id="pending_request_empty">
                 <div class="card card-stats card-danger card-round">
                     <div class="card-body">
                         <div class="row">
@@ -194,6 +194,13 @@
         let requestsRow = document.querySelector("#requests-row");
         let cardWrapper = document.createElement("div");
         cardWrapper.classList.add("col-md-4");
+
+        let requestorcode = document.getElementById(`requestor${data.request_code}`);
+        console.log("requestorcode", requestorcode);  
+
+        if (requestorcode) {
+            requestorcode.remove();
+        }
 
         cardWrapper.innerHTML = `
             <div class="card card-post card-round" style="border-top: 3px solid #6861ce;">
