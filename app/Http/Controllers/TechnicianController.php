@@ -192,6 +192,7 @@ class TechnicianController extends Controller
                 ->where('id', $tranferred->id)
                 ->where('status', 'transferred')
                 ->first();
+        // $techfrom = Dtruser::where('username', $activity->tech_from);
 
         $transferredData = [
             'request_code' => $req->code,
