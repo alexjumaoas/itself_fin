@@ -429,7 +429,16 @@ TransferRequestsRef.on('child_added', (snapshot) => {
         }
     }
 
-    function deleteTransfer(Key){
+    function deleteTransfer(key){
+
+        TransferRequestsRef.child(key).remove();
+
+        .then(() => {
+            console.log("Transfer Request successfully deleted");
+        })
+        .catch((erro) =>{
+            console.log("error deleting pending request firebase");
+        })
 
     }
 </script>

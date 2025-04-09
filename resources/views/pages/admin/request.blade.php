@@ -23,8 +23,6 @@ use App\Models\Dtruser;
      
         @if($pending->status == "transferred" && (int) $userInfo->username === $pending->tech_to || $pending->status == "pending" )
 
-    
-        
             <div class="col-md-3">
                 <div class="card card-post card-round" style="border-top: 3px solid #f25961;">
                     <div class="card-body">
@@ -135,7 +133,7 @@ use App\Models\Dtruser;
 
     <!-- PUT A FOR-LOOP CONTITION HERE -->
     @forelse($job_accepted as $accepted)
-        <div class="col-md-3">
+        <div class="col-md-3" id="acceptedkey{{$accepted->request_code}}">
             <div class="card card-post card-round" style="border-top: 3px solid #6861ce;">
                 <div class="card-body">
                     <div class="d-flex">
