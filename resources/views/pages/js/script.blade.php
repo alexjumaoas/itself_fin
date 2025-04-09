@@ -182,8 +182,6 @@
     pendingRequestsRef.on('child_changed', (snapshot) => {
         const updatedData = snapshot.val();
         const requestKey = snapshot.key;
-
-        document.querySelector(`#pending-${requestKey}`)?.remove();
         
         // Update the specific request in UI
         updatePendingRequestsUI(updatedData,requestKey);
@@ -431,8 +429,7 @@ TransferRequestsRef.on('child_added', (snapshot) => {
 
     function deleteTransfer(key){
 
-        TransferRequestsRef.child(key).remove();
-
+        TransferRequestsRef.child(key).remove()
         .then(() => {
             console.log("Transfer Request successfully deleted");
         })
