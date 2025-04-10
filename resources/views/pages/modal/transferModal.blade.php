@@ -125,8 +125,21 @@
 
             if (!valid) {
                 e.preventDefault(); // Stop form submission if validation fails
+            }else{
+                sessionStorage.setItem('accepted_removed', requestCode);
             }
         });
+
+        document.addEventListener('DOMContentLoaded', function () {
+        const removedKey = sessionStorage.getItem('accepted_removed');
+        if (removedKey) {
+            const card = document.getElementById('acceptedkey' + removedKey);
+            if (card) {
+                card.remove();
+            }
+            sessionStorage.removeItem('accepted_removed'); // Clean it up
+        }
+    });
 
     $('#transferModal').on('hide.bs.modal', function () {
         $('#transferModal form')[0].reset();

@@ -27,7 +27,9 @@ class JobRequestController extends Controller
     public function index()
     {
         $activity_reqs = $this->jobRequestService->getJobRequestByStatus('pending');
-        $activity_acept = $this->jobRequestService->getJobRequestByStatus('accepted');
+        $activity_acept = $this->jobRequestService->getJobRequestByStatus('accepted')
+            ->merge($this->jobRequestService->getJobRequestByStatus('transferred'));
+    
         return view('pages.requestor.newRequest', compact('activity_reqs','activity_acept'));
     }
     

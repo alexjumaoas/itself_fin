@@ -131,10 +131,15 @@ class TechnicianController extends Controller
                 }
 
             }else{
-                return response()->json([
-                    'success' => true,
-                    'isAccepted' =>  $hasaccepted 
-                ]);
+
+                if ($req->ajax() || $req->wantsJson()) {
+                    return response()->json([
+                        'success' => true,
+                        'isAccepted' =>  $hasaccepted 
+                    ]);
+                }else{
+                    return redirect()->route('technician.request');
+                }
             }   
 
 

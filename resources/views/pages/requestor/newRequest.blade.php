@@ -80,6 +80,9 @@
         </div>
        
         @forelse($activity_acept as $accepted)
+        @php
+            $user = App\Models\Dtruser::where('username', $accepted->tech_from)->first();
+        @endphp
             <div class="col-md-4">
                 <div class="card card-post card-round" style="border-top: 3px solid #6861ce;">
                     <div class="card-body">
@@ -93,6 +96,9 @@
                             </div>
                         </div>
                         <div class="separator-solid"></div>
+                        @if($accepted->status == "transferred")
+                                Transfer From <strong>: {{ $user ? $user->fname. ' ' . $user->mname. ' ' . $user->lname : 'N/A'}}</strong>
+                            @endif
                         <p class="card-category text-info mb-1">
                             <a>{{\Carbon\Carbon::parse($accepted->job_req->request_date)->format('F d, Y h:i A')}}</a>
                         </p>
@@ -123,10 +129,17 @@
                     </div>
                     @php
                         $user = App\Models\Dtruser::where('username', $accepted->tech_from)->first();
+                        $userto = App\Models\Dtruser::where('username', $accepted->tech_to)->first();
                     @endphp
-                    <div class="card-footer text-center bubble-shadow" style="background-color: #6861ce; color: white; padding: 10px;">
-                        <strong> {{$user ? $user->fname. ' ' . $user->mname. ' ' . $user->lname : 'N/A'}}</strong> is on the way
+                    <div class="card-footer text-center bubble-shadow" style="{{ $accepted->status == 'transferred' ? 'background-color: #ffad46; color: white; padding: 10px;' : 'background-color: #6861ce; color: white; padding: 10px;'}}">
+                        @if($accepted->status == 'transferred')
+                            <strong> {{$userto ? $userto->fname. ' ' . $userto->mname. ' ' . $userto->lname : 'N/A'}}</strong> is on the way
+                        @else
+                            <strong> {{$user ? $user->fname. ' ' . $user->mname. ' ' . $user->lname : 'N/A'}}</strong> is on the way
+                        @endif
+                        
                     </div>
+                    
                 </div>
             </div>
         @empty

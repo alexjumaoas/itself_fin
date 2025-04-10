@@ -351,7 +351,6 @@
 
 
 //Transfer realtime
-
 const TransferRequestsRef = database.ref('TransferData');
         
 TransferRequestsRef.on('child_added', (snapshot) => {
@@ -389,8 +388,7 @@ TransferRequestsRef.on('child_added', (snapshot) => {
             card.classList.add("col-md-3");
             // card.id = `pending${requestKey}`;
             // card.id = `pending${requestKey.replace(/^[-]+/, '')}`;
-            const modifiedKey = requestKey.replace(/^[-]+/, '');
-            card.id = `pending${modifiedKey}`;
+           
 
             const taskItems = transferData.description.split(',').map(task => `<li><label>${task.trim()}</label></li>`).join('');
             card.innerHTML = `
@@ -417,7 +415,7 @@ TransferRequestsRef.on('child_added', (snapshot) => {
                             <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
                             <ul>${taskItems}</ul>
                         </div>
-                        <button class="btn btn-warning w-100 bubble-shadow" onclick="handleAccept('${modifiedKey}','${transferData.job_request_id}', '${transferData.request_code}','${transferData.requester_name}')">
+                        <button class="btn btn-warning w-100 bubble-shadow" onclick="handleAccept('${requestKey}','${transferData.job_request_id}', '${transferData.request_code}','${transferData.requester_name}')">
                             Accept
                         </button>
                     </div>
