@@ -145,7 +145,7 @@
                                         class="form-control @error('username') is-invalid @enderror" 
                                         id="username" 
                                         name="username" 
-                                        value="{{ old('username') }}" 
+                                        value="{{ old('username') }}" autofocus
                                         required
                                     />
                                     @error('username')

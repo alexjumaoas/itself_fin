@@ -176,7 +176,7 @@ class TechnicianController extends Controller
         // $done->completion_date = Carbon::now();
         // $done->save();
 
-        return Redirect::back()->with('success', 'Job well done!');
+        return Redirect::back()->with('success', 'You have successfully finished a request!');
     }
 
     public function Transfer(Request $req){
