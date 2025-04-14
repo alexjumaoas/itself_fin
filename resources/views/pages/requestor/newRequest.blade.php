@@ -80,10 +80,10 @@
         </div>
        
         @forelse($activity_acept as $accepted)
-        @php
-            $user = App\Models\Dtruser::where('username', $accepted->tech_from)->first();
-        @endphp
-            <div class="col-md-4">
+            @php
+                $user = App\Models\Dtruser::where('username', $accepted->tech_to)->first();
+            @endphp
+            <div class="col-md-4" id="accepted_key{{$accepted->request_code}}">
                 <div class="card card-post card-round" style="border-top: 3px solid #6861ce;">
                     <div class="card-body">
                         <div class="d-flex">
@@ -97,7 +97,7 @@
                         </div>
                         <div class="separator-solid"></div>
                         @if($accepted->status == "transferred")
-                                Transfer From <strong>: {{ $user ? $user->fname. ' ' . $user->mname. ' ' . $user->lname : 'N/A'}}</strong>
+                                Transfer To <strong>: {{ $user ? $user->fname. ' ' . $user->mname. ' ' . $user->lname : 'N/A'}}</strong>
                             @endif
                         <p class="card-category text-info mb-1">
                             <a>{{\Carbon\Carbon::parse($accepted->job_req->request_date)->format('F d, Y h:i A')}}</a>
@@ -194,19 +194,21 @@
       requestsRef.on('child_added', (snapshot) => {
         const requestData = snapshot.val();
         const requestKey = snapshot.key;
-        updateAcceptedRequestsUI(requestData);
+        updateAcceptedRequestsUI(requestData, requestKey);
     });
 
     requestsRef.on('child_changed', (snapshot) => {
         const updatedData = snapshot.val();
-        updateAcceptedRequestsUI(updatedData);
+        updateAcceptedRequestsUI(updatedData, requestKey);
     
     });
 
-    function updateAcceptedRequestsUI(data) {
+    function updateAcceptedRequestsUI(data, requestKey) {
         let requestsRow = document.querySelector("#requests-row");
         let cardWrapper = document.createElement("div");
         cardWrapper.classList.add("col-md-4");
+        const modifiedKey = requestKey.replace(/^[-]+/, '');
+        cardWrapper.id = `aceptedkey${data.request_code}`;
 
         let requestorcode = document.getElementById(`requestor${data.request_code}`);
         console.log("requestorcode", requestorcode);  

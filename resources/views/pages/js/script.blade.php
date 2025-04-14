@@ -71,7 +71,7 @@
 
         console.log("requestKey:", requestKey);
 
-        updateAcceptedRequestsUI(requestData);
+        updateAcceptedRequestsUI(requestData,requestKey);
         setTimeout(() => {
             deleteaccepted(requestKey);
         }, 2000);
@@ -81,11 +81,11 @@
         const updatedData = snapshot.val();
         console.log("Updated Request:", updatedData);
         
-        updateAcceptedRequestsUI(updatedData);
+        updateAcceptedRequestsUI(updatedData, requestKey);
     
     });
 
-    function updateAcceptedRequestsUI(data) {
+    function updateAcceptedRequestsUI(data, requestKey) {
         console.log("data1::", data, user.userid);
         if(user.userid == data.tech_id) return;
 
@@ -93,7 +93,8 @@
 
         let cardWrapper = document.createElement("div");
         cardWrapper.classList.add("col-md-3");
-
+        const modifiedKey = requestKey.replace(/^[-]+/, '');
+        cardWrapper.id = `aceptedkey${modifiedKey}`;
         cardWrapper.innerHTML = `
             <div class="card card-post card-round" style="border-top: 3px solid #6861ce;">
                 <div class="card-body">
@@ -142,7 +143,7 @@
 
                 ul.appendChild(li);
             });
-
+            $(`#aceptedkey${data.request_code}`).remove();
         }else{
             let li = document.createElement("li");
             li.innerHTML = "<label>No description available</label>";
@@ -372,7 +373,7 @@ TransferRequestsRef.on('child_added', (snapshot) => {
         const requestKey = snapshot.key;
 
         document.querySelector(`#transfer${requestKey}`)?.remove();
-        
+       
         // Update the specific request in UI
         updateTransferRequestsUI(updatedData,requestKey);
     
@@ -389,7 +390,6 @@ TransferRequestsRef.on('child_added', (snapshot) => {
             // card.id = `pending${requestKey}`;
             // card.id = `pending${requestKey.replace(/^[-]+/, '')}`;
            
-
             const taskItems = transferData.description.split(',').map(task => `<li><label>${task.trim()}</label></li>`).join('');
             card.innerHTML = `
                 <div class="card card-post card-round" style="border-top: 3px solid #f25961;">
