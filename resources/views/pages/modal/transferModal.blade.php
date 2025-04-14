@@ -103,34 +103,38 @@
         });
     });
 
- 
-        document.querySelector('form[action*="technician.transfer"]').addEventListener('submit', function (e) {
-            const transferSelect = document.getElementById('transferTo');
-            const transferReason = document.getElementById('transferReason');
-            let valid = true;
+    document.addEventListener('DOMContentLoaded', function () {
+        
+        const transferForm = document.querySelector('form[action*="technician.transfer"]');
+        if (transferForm) {
+            transferForm.addEventListener('submit', function (e) {
+                const transferSelect = document.getElementById('transferTo');
+                const transferReason = document.getElementById('transferReason');
+                let valid = true;
 
-            if (!transferSelect.value) {
-                transferSelect.classList.add('is-invalid');
-                valid = false;
-            } else {
-                transferSelect.classList.remove('is-invalid');
-            }
+                if (!transferSelect.value) {
+                    transferSelect.classList.add('is-invalid');
+                    valid = false;
+                } else {
+                    transferSelect.classList.remove('is-invalid');
+                }
 
-            if (!transferReason.value.trim()) {
-                transferReason.classList.add('is-invalid');
-                valid = false;
-            } else {
-                transferReason.classList.remove('is-invalid');
-            }
+                if (!transferReason.value.trim()) {
+                    transferReason.classList.add('is-invalid');
+                    valid = false;
+                } else {
+                    transferReason.classList.remove('is-invalid');
+                }
 
-            if (!valid) {
-                e.preventDefault(); // Stop form submission if validation fails
-            }else{
-                sessionStorage.setItem('accepted_removed', requestCode);
-            }
-        });
+                if (!valid) {
+                    e.preventDefault(); // Stop form submission if validation fails
+                } else {
+                    const requestCode = document.getElementById('request_code')?.value;
+                    sessionStorage.setItem('accepted_removed', requestCode);
+                }
+            });
+        }
 
-        document.addEventListener('DOMContentLoaded', function () {
         const removedKey = sessionStorage.getItem('accepted_removed');
         if (removedKey) {
             const card = document.getElementById('acceptedkey' + removedKey);

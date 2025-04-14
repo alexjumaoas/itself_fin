@@ -75,6 +75,7 @@ use App\Models\Dtruser;
                                 action="{{ route('technician.accept', ['job' => $pending->job_req->id, 'code' => $pending->job_req->request_code]) }}"
                                 method="POST">
                                 @csrf
+                                <input type="hidden" name="hastransfer" value="1">
                                 <button class="btn btn-warning w-100 bubble-shadow" id="alert_demo_8">
                                     Accept
                                 </button>

@@ -71,17 +71,16 @@ class TechnicianController extends Controller
 
     public function acceptRequest(Request $req, $id, $code)
     {
-
             $latestaccepted =  Activity_request::where('request_code', $code)
             ->where('status', 'accepted')
             ->orderBy('created_at', 'desc')
             ->first();
             
             $hasaccepted = $latestaccepted ? 1 : 0;
-      
+           
             $user = $req->get('currentUser');
-            if($hasaccepted === 0){
-
+            if($hasaccepted === 0 || $req->hastransfer == 1){
+             
                 $act_req = new Activity_request();
                 $act_req->tech_from = $user->userid;
                 $act_req->request_code = $code;
@@ -131,7 +130,6 @@ class TechnicianController extends Controller
                 }
 
             }else{
-
                 if ($req->ajax() || $req->wantsJson()) {
                     return response()->json([
                         'success' => true,
@@ -182,7 +180,6 @@ class TechnicianController extends Controller
     public function Transfer(Request $req){
         //Transfered_Request
         $user = $req->get('currentUser');
-            
         $tranferred = new Activity_request();
         $tranferred->tech_from = $user->userid;
         $tranferred->tech_to = $req->transferTo;
