@@ -131,18 +131,19 @@
 @include('pages.modal.requestorDashModal')
 
 @if(session('success'))
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            swal({
-                title: "Success!",
-                text: "{{ session('success') }}",
-                icon: "success",
-                button: "OK", // OK button
-            }).then(function() {
-                // window.location = "{{ route('currentRequest') }}"; // Redirect to currentRequest after OK
-            });
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        swal({
+            title: "Success!",
+            text: "{{ session('success') }}",
+            icon: "success",
+            button: "OK", // OK button
+            timer: 3000, // Close after 3 seconds
+            buttons: false, // Disable the button
         });
-    </script>
+    });
+</script>
+
 @endif
 
 <script>
