@@ -247,96 +247,6 @@
        $('#pendingrequestEmpty').remove();
     }
 
-    function handleAccept(requestKey, job_id, code, fullname) {
-        if (!job_id && !code) {
-            console.error("job id and code is missing");
-            return;
-        }
-
-        fetch(`/technician/${job_id}/${code}/accept`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'X-Requested-With': 'XMLHttpRequest' 
-            },
-            body: JSON.stringify({})
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.text().then(text => {
-                    console.error("Server response:", text);
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("accepted data now", data);
-               // Remove the request from the UI
-               let modifiedKey = requestKey.replace(/^[-]+/, '');
-               let requestedCard = document.getElementById(`pending${modifiedKey}`);
-           
-            if(data.isAccepted === 1){
-                swal({
-                        title: "Error!",
-                        text: "This Pending Request is Already accepted by other technician!",
-                        icon: "error",
-                        button: "OK"
-                    });
-                    requestedCard.remove();
-            }else{
-                if (data.success) {
-                    swal({
-                        title: "Success!",
-                        text: `Request from ${data.fullname} is accepted`,
-                        icon: "success",
-                        button: "OK",
-                        timer: 5000
-                    });
-                    requestedCard.remove();
-                    location.reload();
-                    // if (data.firebaseData) {
-         
-                    //     const database = firebase.database();
-                        
-                    //     const requestsRef = database.ref('acceptedRequests');
-                        
-                    //     const newRequestRef = requestsRef.push();
-                        
-                    //     newRequestRef.set(data.firebaseData)
-                    //         .then(() => {
-                    //             console.log('Request saved to Firebase successfully');
-                    //         })
-                    //         .catch((error) => {
-                    //             console.error('Error saving to Firebase:', error);
-                    //         });
-
-                    // }
-                    
-                    console.log('ajax data',data.firebaseData);
-                } else {
-                    swal({
-                        title: "Error!",
-                        text: data.message || "Failed to accept request",
-                        icon: "error",
-                        button: "OK"
-                    });
-                }
-            }
-         
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            swal({
-                title: "Error!",
-                text: "Something went wrong. Please try again.",
-                icon: "error",
-                button: "OK"
-            });
-        });
-    }
-
     function deletePending(pendingkey){
 
         console.log("pending key", pendingkey);
@@ -424,6 +334,80 @@ TransferRequestsRef.on('child_added', (snapshot) => {
             container.prepend(card);
         }
     }
+
+    function handleAccept(requestKey, job_id, code, fullname) {
+        if (!job_id && !code) {
+            console.error("job id and code is missing");
+            return;
+        }
+
+        fetch(`/technician/${job_id}/${code}/accept`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'X-Requested-With': 'XMLHttpRequest' 
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    console.error("Server response:", text);
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("accepted data now", data);
+               // Remove the request from the UI
+               let requestedCard = document.getElementById(`pending${requestKey}`);
+        
+            if(data.isAccepted === 1){
+                swal({
+                        title: "Error!",
+                        text: "This Pending Request is Already accepted by other technician!",
+                        icon: "error",
+                        button: "OK"
+                    });
+                    console.log("requestedCard::", requestedCard);
+                    requestedCard.remove();
+            }else{
+                if (data.success) {
+                    swal({
+                        title: "Success!",
+                        text: `Request from ${data.fullname} is accepted`,
+                        icon: "success",
+                        button: "OK",
+                        timer: 5000
+                    });
+                    requestedCard.remove();
+
+                    location.reload();
+                   
+                } else {
+                    swal({
+                        title: "Error!",
+                        text: data.message || "Failed to accept request",
+                        icon: "error",
+                        button: "OK"
+                    });
+                }
+            }
+         
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            swal({
+                title: "Error!",
+                text: "Something went wrong. Please try again.",
+                icon: "error",
+                button: "OK"
+            });
+        });
+    }
+
 
     function deleteTransfer(key){
 
