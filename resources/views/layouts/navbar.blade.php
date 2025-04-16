@@ -385,7 +385,7 @@
         />
       </div>
       <span class="profile-username">
-        <span class="op-7">Hi,</span>
+        <span class="op-7">Hi, I'm </span>
         <span class="fw-bold">{{$userInfo->fname}}</span>
       </span>
     </a>
