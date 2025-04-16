@@ -13,7 +13,7 @@ class Job_request extends Model
 
     protected $fillable = ['requester_id','tech_id','description','request_date','assigned_date', 'completion_date'];
 
- 
+
     public function requester()
     {
         return $this->belongsTo(Dts_user::class,'requester_id','username');

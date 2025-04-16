@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Dts_user extends Model
 {
-    //
     protected $connection = 'dts';
     protected $table = 'users';
 
@@ -15,13 +14,13 @@ class Dts_user extends Model
      {
          return $this->belongsTo(Dts_designation::class, 'designation');
      }
- 
+
      // Relationship with Division
      public function divisionRel()
      {
          return $this->belongsTo(Dts_division::class, 'division');
      }
- 
+
      // Relationship with Section
      public function sectionRel()
      {

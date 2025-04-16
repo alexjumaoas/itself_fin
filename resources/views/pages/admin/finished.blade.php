@@ -158,29 +158,25 @@ a.btn {
             <div class="card-body">
                 <div class="row">
                     @foreach($job_completed as $completed)
-                        <div class="col-md-4 mb-4">
+                        <div class="col-md-3 mb-4">
                             <div class="box bubble-shadow">
                                 <div class="header">
-                                    <div class="part_one"><p style="margin-left: 8px; margin-top: 4px; color: white; font-size: 18px;">
-                                          REQUEST
-                                    </p></div>
+                                    <div class="part_one"><p style="margin-left: 8px; margin-top: 4px; color: white; font-size: 14px;">
+                                        <strong>{{ \Carbon\Carbon::parse($completed->created_at)->format('F j, Y') }}</strong></p>
+                                    </div>
                                     <div class="part_two"></div>
                                 </div>
                                 <div class="content">
-                                    <div class="mb-2" style="text-align: right;">Requested: <strong>{{ \Carbon\Carbon::parse($completed->created_at)->format('F j, Y') }}</strong></div>
+                                    {{-- <div class="mb-2" style="text-align: right;">Requested: <strong>{{ \Carbon\Carbon::parse($completed->created_at)->format('F j, Y') }}</strong></div> --}}
+                                    <div class="mb-4" style="text-align: right;"></div>
                                     <div class="mb-2" style="font-size: 16px"><strong>{{$completed->request_code}}</strong></div>
-                                    <div class="op-8">Accepted: <strong>{{$completed->job_req->request_date}}</strong> </div>
-                                    <div class="op-8">Finished: <strong>{{$completed->updated_at}}</strong> </div>
-                                    {{-- <div class="op-8">Started: {{ \Carbon\Carbon::parse($completed->request_history->assigned_date)->format('h:i:s A') }}</div>
-                                    <div class="op-8">Ended: {{ \Carbon\Carbon::parse($completed->request_history->completion_date)->format('h:i:s A') }}</div> --}}
+                                    <div class="op-8">Accepted: {{ \Carbon\Carbon::parse($completed->job_req->request_date)->format('h:i:s A') }} </div>
+                                    <div class="op-8">Finished: {{ ($completed->updated_at)->format('h:i:s A') }} </div>
                                     <div class="mt-5">
                                         <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#jobModal{{$completed->id}}">Show Request</button>
-                                        <a href="{{ route('generate.pdf') }}" target="_blank" class="btn btn-sm btn-success">
-                                            {{-- <button type="button" class="btn btn-sm btn-success"> --}}
-                                                <i class="fas fa-file-pdf" style="font-size: 16px;"></i>
-                                            {{-- </button> --}}
+                                        <a href="{{ route('generate.pdf', ['request_code' => $completed->request_code]) }}" target="_blank" class="btn btn-sm btn-success">
+                                            <i class="fas fa-file-pdf" style="font-size: 16px;"></i>
                                         </a>
-
                                     </div>
                                 </div>
                             </div>

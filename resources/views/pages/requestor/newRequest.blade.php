@@ -17,7 +17,7 @@
                             </div>
                             <div class="info-post ms-2">
                                 <p class="username">{{$pending->job_req->requester->fname . ' ' . $pending->job_req->requester->lname}}</p>
-                                <p class="text text-muted">{{$pending->job_req->requester->sectionRel->acronym}} Section {{ $pending->job_req->requester->divisionRel->description}}</p>    
+                                <p class="text text-muted">{{$pending->job_req->requester->sectionRel->acronym}} Section {{ $pending->job_req->requester->divisionRel->description}}</p>
                             </div>
                         </div>
                         <div class="separator-solid"></div>
@@ -52,13 +52,13 @@
                      <button class="btn btn-danger bubble-shadow" data-bs-toggle="modal" data-bs-target="#cancelRequestModal"
                         onclick="setCancelRequest('{{ $pending->job_req->id }}', '{{ $pending->job_req->request_code ?? '' }}')">
                         Cancel Request
-                    </button> 
+                    </button>
                 </div>
             </div>
         @empty
             <!-- FOR CURRENT REQUEST, IF EMPTY OR NOT -->
             <div class="col-sm-6 col-md-12" id="pending_request_empty">
-                <div class="card card-stats card-danger card-round">
+                <div class="card card-stats card-round" style="background-color: #F69095; color: white;">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12">
@@ -78,7 +78,7 @@
         <div class="page-header" style="margin-bottom: 0; margin-top: 10px;">
             <h3 class="fw-bold mb-3">ONGOING REQUEST(S)</h3>
         </div>
-       
+
         @forelse($activity_acept as $accepted)
             @php
                 $user = App\Models\Dtruser::where('username', $accepted->tech_to)->first();
@@ -137,9 +137,9 @@
                         @else
                             <strong> {{$user ? $user->fname. ' ' . $user->mname. ' ' . $user->lname : 'N/A'}}</strong> is on the way
                         @endif
-                        
+
                     </div>
-                    
+
                 </div>
             </div>
         @empty
@@ -185,7 +185,7 @@
             appId: "1:865081651173:web:124dff13445781cf4f890c",
             measurementId: "G-JVFWD126DM"
         };
-        
+
     firebase.initializeApp(firebaseConfig);
 
     const database = firebase.database();
@@ -200,7 +200,7 @@
     requestsRef.on('child_changed', (snapshot) => {
         const updatedData = snapshot.val();
         updateAcceptedRequestsUI(updatedData, requestKey);
-    
+
     });
 
     function updateAcceptedRequestsUI(data, requestKey) {
@@ -211,7 +211,7 @@
         cardWrapper.id = `aceptedkey${data.request_code}`;
 
         let requestorcode = document.getElementById(`requestor${data.request_code}`);
-        console.log("requestorcode", requestorcode);  
+        console.log("requestorcode", requestorcode);
 
         if (requestorcode) {
             requestorcode.remove();
@@ -240,7 +240,7 @@
                         <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
                         <ul id="request-list"></ul>
                     </div>
-                    
+
                 </div>
                 <div class="card-footer text-center bubble-shadow w-100" style="background-color: #6861ce; color: white; padding: 10px;">
                     <strong>${data.tech_name} is on the way</strong>
@@ -248,12 +248,12 @@
             </div>
         `;
          requestsRow.appendChild(cardWrapper);
-        
+
         let ul = cardWrapper.querySelector("#request-list");
-        
+
         if(data.description){
             const description = data.description.split(',').map(item => item.trim());
-            
+
             description.forEach((task, index) => {
                 let li = document.createElement("li");
 
@@ -277,7 +277,7 @@
     document.addEventListener('DOMContentLoaded', function() {
 
         const PendingData = @json(session('PendingData'));
-            
+
         if(PendingData){
 
             swal({
@@ -292,10 +292,10 @@
 
                 // Get reference to the Firebase database
             const database = firebase.database();
-            
+
             // Create a reference for the accepted requests
             const requestsRef = database.ref('pendingRequests');
-            
+
             // Generate a new key for this request
             const newRequestRef = requestsRef.push();
             console.log("my pending data", PendingData);
@@ -310,7 +310,7 @@
         }else{
             console.log("no data request job");
         }
-           
+
     });
 
 </script>

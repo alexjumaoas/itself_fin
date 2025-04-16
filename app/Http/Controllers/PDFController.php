@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use FPDF;
+use App\Models\Activity_request;
+use App\Models\Job_request;
+use App\Models\Dts_user;
 
 class CustomPDF extends \FPDF
 {
@@ -47,8 +50,59 @@ class CustomPDF extends \FPDF
 
 class PDFController extends Controller
 {
-    public function generatePDF()
+    public function generatePDF($request_code)
     {
+        $pendingRequest = Activity_request::where('request_code', $request_code)
+            ->where('status', 'pending')
+            ->first();
+
+        $acceptedRequest = Activity_request::where('request_code', $request_code)
+            ->where('status', 'accepted')
+            ->first();
+
+        $completedRequest = Activity_request::where('request_code', $request_code)
+            ->where('status', 'completed')
+            ->first();
+
+        $requestingTo = Job_request::where('request_code', $request_code)->get();
+
+        $requester = Job_request::where('request_code', $request_code)
+            ->with('requester.sectionRel')
+            ->first()
+            ?->requester;
+
+        $requesterName = trim(($requester?->fname ?? '') . ' ' . ($requester?->mname ?? '') . ' ' . ($requester?->lname ?? '')) ?: 'Unknown';
+
+        // $requesterSection = $requester?->sectionRel?->acronym
+        //     ?? $requester?->sectionRel?->description
+        //     ?? 'Unknown';
+
+        $section = $requester?->sectionRel;
+        $division = $requester?->divisionRel;
+
+        if (!empty($section?->acronym)) {
+            // If acronym exists, combine acronym and division description
+            $requesterSection = $section->acronym;
+
+            if (!empty($division?->description)) {
+                $requesterSection .= ' - ' . $division->description;
+            }
+        } else {
+            // No acronym, fallback to section description
+            $requesterSection = $section?->description ?? 'Unknown';
+        }
+
+
+
+        $technician = Activity_request::where('request_code', $request_code)
+            ->where('status', 'completed')
+            ->with('techFromUser')
+            ->first();
+
+        $technicianName = trim(($technician?->techFromUser?->fname ?? '') . ' ' . ($technician?->techFromUser?->mname ?? '') . ' ' . ($technician?->techFromUser?->lname ?? '')) ?: 'Unknown';
+
+
+
         $pdf = new CustomPDF();
         $pdf->AddPage();
 
@@ -56,37 +110,37 @@ class PDFController extends Controller
         $pdf->SetFont('Arial', '', 10);
         $pdf->Cell(26, 8, "Request Code : ", 0, 0, '', true);
         $pdf->SetFont('Arial', 'B', 10);
-        $pdf->Cell(68, 8, iconv('UTF-8', 'windows-1252', "20250410083023-9979"), 0, 0, '', true);
+        $pdf->Cell(68, 8, $pendingRequest->request_code, 0, 0, '', true);
         $pdf->Cell(2, 8, '', 0, 0);
 
         $pdf->SetFont('Arial', '', 10);
         $pdf->Cell(11, 8, "Date : ", 0, 0, '', true);
         $pdf->SetFont('Arial', 'B', 10);
-        $pdf->Cell(35, 8, "April 10, 2025", 0, 0, '', true);
+        $pdf->Cell(35, 8, $pendingRequest->created_at->format('M. d, Y'), 0, 0, '', true);
         $pdf->Cell(2, 8, '', 0, 0);
 
         $pdf->SetFont('Arial', '', 10);
         $pdf->Cell(11, 8, "Time : ", 0, 0, '', true);
         $pdf->SetFont('Arial', 'B', 10);
-        $pdf->Cell(35, 8, "08:30:23 AM", 0, 1, '', true);
+        $pdf->Cell(35, 8, $pendingRequest->created_at->format('h:i:s A'), 0, 1, '', true);
         $pdf->Ln(2);
 
         $pdf->SetFont('Arial', '', 10);
         $pdf->Cell(25, 8, "Requested by : ", 0, 0, '', true);
         $pdf->SetFont('Arial', 'B', 10);
-        $pdf->Cell(69, 8, "Juan Dela Cruz", 0, 0, 'L', true);
+        $pdf->Cell(69, 8, iconv('UTF-8', 'windows-1252', $requesterName), 0, 0, 'L', true);
         $pdf->Cell(2, 8, '', 0, 0);
 
         $pdf->SetFont('Arial', '', 10);
         $pdf->Cell(13, 8, "Office : ", 0, 0, '', true);
         $pdf->SetFont('Arial', 'B', 10);
-        $pdf->Cell(81, 8, "ICTU Section Office of the RD / ARD", 0, 1, '', true);
+        $pdf->Cell(81, 8, iconv('UTF-8', 'windows-1252', $requesterSection), 0, 1, '', true);
         $pdf->Ln(2);
 
         $pdf->SetFont('Arial', '', 10);
         $pdf->Cell(23, 8, "Received by :", 0, 0, '', true);
         $pdf->SetFont('Arial', 'B', 10);
-        $pdf->Cell(0, 8, "Jondy Gonzales", 0, 1, '', true);
+        $pdf->Cell(0, 8, iconv('UTF-8', 'windows-1252', $technicianName), 0, 1, '', true);
         $pdf->Ln(7);
         //----------------------------------------------------
 
@@ -97,48 +151,106 @@ class PDFController extends Controller
         $startX = 10; // margin from left
         $boxWidth = 190;
         $lineHeight = 8;
-
         $pdf->Ln(3);
+
+        $checkDesktopExist = $requestingTo->contains(function ($item) {
+            return str_contains($item->description, 'Check Computer Desktop / Laptop');
+        });
+
+        $checkPrinterExist = $requestingTo->contains(function ($item) {
+            return str_contains($item->description, 'Install Printer');
+        });
+
+        $checkInternetExist = $requestingTo->contains(function ($item) {
+            return str_contains($item->description, 'Check Internet Connection');
+        });
+
+        $checkInstallAppExist = $requestingTo->contains(function ($item) {
+            return str_contains($item->description, 'Install Software Application');
+        });
+
+        $checkMonitorExist = $requestingTo->contains(function ($item) {
+            return str_contains($item->description, 'Check Monitor');
+        });
+
+        $checkBiometricsExist = $requestingTo->contains(function ($item) {
+            return str_contains($item->description, 'Biometrics Registration');
+        });
+
+        $checkMouseKeybExist = $requestingTo->contains(function ($item) {
+            return str_contains($item->description, 'Check Mouse / Keyboard');
+        });
+
+        $checkTechAssistExist = $requestingTo->contains(function ($item) {
+            return str_contains($item->description, 'System Technical Assistance');
+        });
+
+        $checkOthersExist = $requestingTo->contains(function ($item) {
+            return str_contains($item->description, 'Others');
+        });
+
+        $requestingOthers = Job_request::where('request_code', $request_code)->first();
+
+        $othersText = '';
+        if ($requestingOthers && $requestingOthers->description) {
+            $descriptions = array_map('trim', explode(',', $requestingOthers->description));
+
+            $othersIndex = array_search('Others', $descriptions);
+
+            if ($othersIndex !== false && isset($descriptions[$othersIndex + 1])) {
+                $othersText = $descriptions[$othersIndex + 1];
+            }
+        }
+
+        // Determine image for each description
+        $imageDesktop = $checkDesktopExist ? '/assets/img/checkbox-checked.png' : '/assets/img/checkbox-empty.png';
+        $imagePrinter = $checkPrinterExist ? '/assets/img/checkbox-checked.png' : '/assets/img/checkbox-empty.png';
+        $imageInternet = $checkInternetExist ? '/assets/img/checkbox-checked.png' : '/assets/img/checkbox-empty.png';
+        $imageInstallApp = $checkInstallAppExist ? '/assets/img/checkbox-checked.png' : '/assets/img/checkbox-empty.png';
+        $imageMonitor = $checkMonitorExist ? '/assets/img/checkbox-checked.png' : '/assets/img/checkbox-empty.png';
+        $imageBiometrics = $checkBiometricsExist ? '/assets/img/checkbox-checked.png' : '/assets/img/checkbox-empty.png';
+        $imageMouseKeyb = $checkMouseKeybExist ? '/assets/img/checkbox-checked.png' : '/assets/img/checkbox-empty.png';
+        $imageTechAssist = $checkTechAssistExist ? '/assets/img/checkbox-checked.png' : '/assets/img/checkbox-empty.png';
+        $imageOthers = $checkOthersExist ? '/assets/img/checkbox-checked.png' : '/assets/img/checkbox-empty.png';
+
         $pdf->SetFont('Arial', '', 10);
-        $pdf->Image($_SERVER['DOCUMENT_ROOT'] . '/assets/img/checkbox-checked.png', 15, $pdf->GetY(), 6, 6);
-        $pdf->Cell(12); // Space after checkbox
+        $pdf->Image($_SERVER['DOCUMENT_ROOT'] . $imageDesktop, 15, $pdf->GetY(), 6, 6);
+        $pdf->Cell(12);
         $pdf->Cell(85, 6, "Check Computer Desktop / Laptop", 0, 0);
 
-        $pdf->Image($_SERVER['DOCUMENT_ROOT'] . '/assets/img/checkbox-empty.png', $pdf->GetX(), $pdf->GetY(), 6, 6);
+        $pdf->Image($_SERVER['DOCUMENT_ROOT'] . $imagePrinter, $pdf->GetX(), $pdf->GetY(), 6, 6);
         $pdf->Cell(8);
         $pdf->Cell(5, 6, "Install Printer", 0, 1 );
 
-        $pdf->Image($_SERVER['DOCUMENT_ROOT'] . '/assets/img/checkbox-empty.png', 15, $pdf->GetY(), 6, 6);
+        $pdf->Image($_SERVER['DOCUMENT_ROOT'] . $imageInternet, 15, $pdf->GetY(), 6, 6);
         $pdf->Cell(12);
         $pdf->Cell(85, 6, "Check Internet Connection", 0, 0);
 
-        $pdf->Image($_SERVER['DOCUMENT_ROOT'] . '/assets/img/checkbox-checked.png', $pdf->GetX(), $pdf->GetY(), 6, 6);
+        $pdf->Image($_SERVER['DOCUMENT_ROOT'] . $imageInstallApp, $pdf->GetX(), $pdf->GetY(), 6, 6);
         $pdf->Cell(8);
         $pdf->Cell(5, 6, "Install Software Application", 0, 1 );
 
-        $pdf->Image($_SERVER['DOCUMENT_ROOT'] . '/assets/img/checkbox-checked.png', 15, $pdf->GetY(), 6, 6);
+        $pdf->Image($_SERVER['DOCUMENT_ROOT'] . $imageMonitor, 15, $pdf->GetY(), 6, 6);
         $pdf->Cell(12);
         $pdf->Cell(85, 6, "Check Monitor", 0, 0);
 
-        $pdf->Image($_SERVER['DOCUMENT_ROOT'] . '/assets/img/checkbox-checked.png', $pdf->GetX(), $pdf->GetY(), 6, 6);
+        $pdf->Image($_SERVER['DOCUMENT_ROOT'] . $imageBiometrics, $pdf->GetX(), $pdf->GetY(), 6, 6);
         $pdf->Cell(8);
         $pdf->Cell(5, 6, "Biometrics Registration", 0, 1 );
 
-        $pdf->Image($_SERVER['DOCUMENT_ROOT'] . '/assets/img/checkbox-empty.png', 15, $pdf->GetY(), 6, 6);
+        $pdf->Image($_SERVER['DOCUMENT_ROOT'] . $imageMouseKeyb, 15, $pdf->GetY(), 6, 6);
         $pdf->Cell(12);
         $pdf->Cell(85, 6, "Check Mouse / Keyboard", 0, 0);
 
-        $pdf->Image($_SERVER['DOCUMENT_ROOT'] . '/assets/img/checkbox-empty.png', $pdf->GetX(), $pdf->GetY(), 6, 6);
+        $pdf->Image($_SERVER['DOCUMENT_ROOT'] . $imageTechAssist, $pdf->GetX(), $pdf->GetY(), 6, 6);
         $pdf->Cell(8);
-        $pdf->Cell(5, 6, "System Technical Asistance", 0, 1 );
+        $pdf->Cell(5, 6, "System Technical Assistance", 0, 1 );
 
-        $pdf->Image($_SERVER['DOCUMENT_ROOT'] . '/assets/img/checkbox-checked.png', 15, $pdf->GetY(), 6, 6);
+        $pdf->Image($_SERVER['DOCUMENT_ROOT'] .  $imageOthers, 15, $pdf->GetY(), 6, 6);
         $pdf->Cell(12);
         $pdf->Cell(0, 6, "Others : (Please Specify)", 0, 1);
         $pdf->Cell(12);
-        $pdf->Cell(0, 6, "Please retrieve my files / For recovery", 0, 1);
-        $pdf->Cell(12);
-        $pdf->Cell(0, 6, "Sample Request Test", 0, 1);
+        $pdf->Cell(0, 6, iconv('UTF-8', 'windows-1252', $othersText), 0, 1);
 
         $endY = $pdf->GetY(); // Save ending Y to calculate height of the box
         $pdf->Rect($startX, $startY, $boxWidth, $endY - $startY); // Draw rectangle around the content
@@ -155,51 +267,51 @@ class PDFController extends Controller
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell(52, 8, "Fault Detection :", 'LT', 0);
         $pdf->SetFont('Arial', '', 10);
-        $pdf->Cell(0, 8, "Loose RJ45 connection", 'LTR', 1);
+        $pdf->Cell(0, 8, iconv('UTF-8', 'windows-1252', $completedRequest->diagnosis), 'LTR', 1);
 
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell(52, 8, "Work Done :", 'LT', 0);
         $pdf->SetFont('Arial', '', 10);
-        $pdf->Cell(0, 8, "Troubleshoot LAN connection and recrimp RJ45 connector", 'LTR', 1);
+        $pdf->Cell(0, 8, iconv('UTF-8', 'windows-1252', $completedRequest->action), 'LTR', 1);
 
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell(52, 8, "Remarks / Recommendation :", 'LTB', 0);
         $pdf->SetFont('Arial', '', 10);
-        $pdf->Cell(0, 8, "Solved", 'LTRB', 1);
+        $pdf->Cell(0, 8, iconv('UTF-8', 'windows-1252', $completedRequest->resolution_notes), 'LTRB', 1);
         $pdf->Ln(7);
         //--------------------------------------------------------------------------
 
         $pdf->Cell(52, 8, "", 'LT', 0);
         $pdf->SetFont('Arial', '', 10);
         $pdf->Cell(27, 8, "Date :", 'LT', 0);
-        $pdf->Cell(111, 8, "April 10, 2025", 'TR', 1);
+        $pdf->Cell(111, 8, $acceptedRequest->created_at->format('F j, Y'), 'TR', 1);
 
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell(52, 8, "Acted Upon :", 'L', 0, 'C');
         $pdf->SetFont('Arial', '', 10);
         $pdf->Cell(27, 8, "Time :", 'LT', 0);
-        $pdf->Cell(111, 8, "08:32:15 AM", 'TR',1);
+        $pdf->Cell(111, 8, $acceptedRequest->created_at->format('h:i:s A'), 'TR',1);
 
         $pdf->Cell(52, 8, "", 'LB', 0);
         $pdf->Cell(27, 8, "Serviced by :", 'LTB', 0);
-        $pdf->Cell(111, 8, "Jondy Gonzales", 'TRB', 1);
+        $pdf->Cell(111, 8, iconv('UTF-8', 'windows-1252', $technicianName), 'TRB', 1);
         $pdf->Ln(7);
         //--------------------------------------------------------------------------
 
         $pdf->Cell(52, 8, "", 'LT', 0);
         $pdf->SetFont('Arial', '', 10);
         $pdf->Cell(27, 8, "Date :", 'LT', 0);
-        $pdf->Cell(111, 8, "April 10, 2025", 'TR', 1);
+        $pdf->Cell(111, 8, $completedRequest->created_at->format('F j, Y'), 'TR', 1);
 
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell(52, 8, "Completion :", 'L', 0, 'C');
         $pdf->SetFont('Arial', '', 10);
         $pdf->Cell(27, 8, "Time :", 'LT', 0);
-        $pdf->Cell(111, 8, "08:47:39 AM", 'TR',1);
+        $pdf->Cell(111, 8, $completedRequest->created_at->format('h:i:s A'), 'TR',1);
 
         $pdf->Cell(52, 8, "", 'LB', 0);
         $pdf->Cell(27, 8, "Confirmed by :", 'LTB', 0);
-        $pdf->Cell(111, 8, "Juan Dela Cruz", 'TRB', 1);
+        $pdf->Cell(111, 8, iconv('UTF-8', 'windows-1252', $requesterName), 'TRB', 1);
         $pdf->Ln(7);
 
         // Output the PDF
