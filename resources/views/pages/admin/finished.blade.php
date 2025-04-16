@@ -158,19 +158,19 @@ a.btn {
             <div class="card-body">
                 <div class="row">
                     @foreach($job_completed as $completed)
-                        <div class="col-md-3 mb-4">
+                        <div class="col-md-4 mb-4">
                             <div class="box bubble-shadow">
                                 <div class="header">
                                     <div class="part_one"><p style="margin-left: 8px; margin-top: 4px; color: white; font-size: 18px;">
-                                          2025-001
+                                          REQUEST
                                     </p></div>
                                     <div class="part_two"></div>
                                 </div>
                                 <div class="content">
-                                    <div class="mb-2" style="text-align: right;">{{ \Carbon\Carbon::parse($completed->created_at)->format('F j, Y') }}</div>
-                                    <div class="mb-2" style="font-size: 18px;">{{$completed->request_code}}</div>
-                                    <div class="op-8">Started: </div>
-                                    <div class="op-8">Ended: </div>
+                                    <div class="mb-2" style="text-align: right;">Requested: <strong>{{ \Carbon\Carbon::parse($completed->created_at)->format('F j, Y') }}</strong></div>
+                                    <div class="mb-2" style="font-size: 16px"><strong>{{$completed->request_code}}</strong></div>
+                                    <div class="op-8">Accepted: <strong>{{$completed->job_req->request_date}}</strong> </div>
+                                    <div class="op-8">Finished: <strong>{{$completed->updated_at}}</strong> </div>
                                     {{-- <div class="op-8">Started: {{ \Carbon\Carbon::parse($completed->request_history->assigned_date)->format('h:i:s A') }}</div>
                                     <div class="op-8">Ended: {{ \Carbon\Carbon::parse($completed->request_history->completion_date)->format('h:i:s A') }}</div> --}}
                                     <div class="mt-5">
