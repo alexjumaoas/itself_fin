@@ -56,12 +56,13 @@
                                     </div>
                                     <div class="info-post ms-2">
                                         <p class="username">Juan Dela Cruz</p>
+                                        <p class="username">{{$completed->job_req->tech_id}}</p>
                                         <p class="date text-muted">ICTU Section Office of the RD / ARD</p>
                                     </div>
                                 </div>
                                 <div class="separator-solid"></div>
                                 <p class="card-category text-info">
-                                    <a>Started: <strong>{{ \Carbon\Carbon::parse($completed->created_at)->format('Y-m-d h:i:s A') }}</strong></a>
+                                    <a>Started: <strong>{{ \Carbon\Carbon::parse($completed->job_req->request_date)->format('Y-m-d h:i:s A') }}</strong></a>
                                 </p>
                                 <p class="card-category text-info mb-1">
                                     <a>Ended: <strong>{{ \Carbon\Carbon::parse($completed->created_at)->format('Y-m-d h:i:s A') }}</strong></a>
