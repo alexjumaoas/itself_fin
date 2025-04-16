@@ -73,10 +73,6 @@ class PDFController extends Controller
 
         $requesterName = trim(($requester?->fname ?? '') . ' ' . ($requester?->mname ?? '') . ' ' . ($requester?->lname ?? '')) ?: 'Unknown';
 
-        // $requesterSection = $requester?->sectionRel?->acronym
-        //     ?? $requester?->sectionRel?->description
-        //     ?? 'Unknown';
-
         $section = $requester?->sectionRel;
         $division = $requester?->divisionRel;
 
@@ -92,16 +88,12 @@ class PDFController extends Controller
             $requesterSection = $section?->description ?? 'Unknown';
         }
 
-
-
         $technician = Activity_request::where('request_code', $request_code)
             ->where('status', 'completed')
             ->with('techFromUser')
             ->first();
 
         $technicianName = trim(($technician?->techFromUser?->fname ?? '') . ' ' . ($technician?->techFromUser?->mname ?? '') . ' ' . ($technician?->techFromUser?->lname ?? '')) ?: 'Unknown';
-
-
 
         $pdf = new CustomPDF();
         $pdf->AddPage();
