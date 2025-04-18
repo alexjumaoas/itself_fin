@@ -170,6 +170,16 @@ class AdminController extends Controller
     {
         $user = $req->get('currentUser');
 
+        $requestId = $req->input('request_id');
+
+        $existingStatus = Activity_request::where('job_request_id', $requestId)
+        ->orderByDesc('id')
+        ->first();
+
+        if ($existingStatus && $existingStatus->status === "accepted") {
+            return response()->json(['error' => 'Cannot cancel an already accepted request'], 400);
+        }
+
         $cancelled_admin  = new Activity_request();
 
         $cancelled_admin->job_request_id = $req->request_id;
@@ -182,7 +192,28 @@ class AdminController extends Controller
         return Redirect::back()->with('success', 'Request cancelled successfully');
     }
 
+    public function checkRequestStatus(Request $req){
 
+        $requestId = $req->input('request_id');
+        $existingStatus = Activity_request::where('job_request_id', $requestId)
+        
+            ->orderByDesc('id')
+            ->first();
+            
+            if ($existingStatus) {
+                if ($existingStatus->status === "accepted") {
+                    return response()->json(['status' => 'accepted', 'canCancel' => false, 'message' => 'This request has already been accepted.']);
+                }
+        
+                if ($existingStatus->status === "cancelled") {
+                    return response()->json(['status' => 'cancelled', 'otherCancel' => false, 'message' => 'This request is already cancelled.']);
+                }
+        
+                return response()->json(['status' => $existingStatus->status, 'canCancel' => true]);
+            }
+        
+        return response()->json(['status' => $existingStatus ? $existingStatus->status : 'unknown', 'canCancel' => true]);
+    }
 
 
 

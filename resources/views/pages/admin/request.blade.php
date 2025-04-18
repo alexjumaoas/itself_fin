@@ -134,7 +134,7 @@ use App\Models\Dtruser;
 
     <!-- PUT A FOR-LOOP CONTITION HERE -->
     @forelse($job_accepted as $accepted)
-        <div class="col-md-3" id="acceptedkey{{$accepted->request_code}}">
+        <div class="col-md-3" id="accepted_key{{$accepted->request_code}}">
             <div class="card card-post card-round" style="border-top: 3px solid #6861ce;">
                 <div class="card-body">
                     <div class="d-flex">
@@ -175,7 +175,7 @@ use App\Models\Dtruser;
                         </ul>
                     </div>
                     @if($userInfo->usertype == 2)
-                        @if($accepted->tech_from == $userInfo->userid)
+                        @if($accepted->tech_from == $userInfo->userid || $accepted->tech_to == $userInfo->userid)
                             <button class="text-center btn btn-warning mt-2"
                                 style="color: white; padding: 4px 6px;"
                                 data-bs-placement="right"
@@ -190,14 +190,25 @@ use App\Models\Dtruser;
                     @endif
                 </div>
                 @php
-                    $user = App\Models\Dtruser::where('username', $accepted->tech_from)->first();
+
+                    $user = App\Models\Dtruser::where(function ($query) use ($accepted) {
+                        if (!empty($accepted->tech_from)) {
+                            $query->where('username', $accepted->tech_from);
+                        }
+
+                        if (!empty($accepted->tech_to)) {
+                            $query->orWhere('username', $accepted->tech_to);
+                        }
+                    })->first();
+
                 @endphp
+
                 @if($userInfo->usertype == 1)
                     <div class="card-footer text-center bubble-shadow" style="background-color: #6861ce; color: white; padding: 10px;">
                       <strong>Accepted by : {{$user ? $user->fname. ' ' . $user->mname. ' ' . $user->lname : 'N/A'}}</strong>
                     </div>
                 @else
-                    @if($accepted->tech_from == $userInfo->userid)
+                    @if($accepted->tech_from == $userInfo->userid || $accepted->tech_to == $userInfo->userid)
                     <div class="card-footer text-center bubble-shadow" style="background-color: #6861ce; color: white; padding: 10px; cursor: pointer"
                         data-code='{{$accepted->job_req->request_code}}'
                         data-id = '{{$accepted->job_req->id}}'
@@ -316,9 +327,9 @@ use App\Models\Dtruser;
     @endforelse
 </div> 
 
-@include('pages.modal.cancelAdminReqModal')
+
 @include('pages.modal.doneRequestModal')
 @include('pages.modal.transferModal')
 @include('pages.js.script')
-
+@include('pages.modal.cancelAdminReqModal')
 @endsection

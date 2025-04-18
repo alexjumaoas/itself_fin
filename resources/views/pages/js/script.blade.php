@@ -16,15 +16,6 @@
 
 @if(session('success'))
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            swal({
-                title: "Success!",
-                text: "{{ session('success') }}",
-                icon: "success",
-                button: "OK",
-                timer: 5000 // Auto close after 5 seconds
-            });
-        });
 
         document.addEventListener('DOMContentLoaded', function() {
             const firebaseData = @json(session('firebaseData'));
@@ -60,7 +51,7 @@
 <script>
     var user = @json($userInfo);
 
-    const database = firebase.database();
+    let database = firebase.database();
 
     const requestsRef = database.ref('acceptedRequests');
   
@@ -205,13 +196,31 @@
         });
 
         let container = document.querySelector("#pending-requests-container");
-
+        let buttonAccepted = '';
         let card = document.createElement("div");
         card.classList.add("col-md-3");
-        // card.id = `pending${requestKey}`;
-        // card.id = `pending${requestKey.replace(/^[-]+/, '')}`;
-        const modifiedKey = requestKey.replace(/^[-]+/, '');
-        card.id = `pending${modifiedKey}`;
+
+        card.id = `pending${pendingData.request_code}`;
+
+        if(user.usertype === 1){
+            buttonAccepted = `
+                <button class="btn btn-danger w-100 bubble-shadow"
+                    data-bs-toggle="modal"
+                    data-bs-target="#cancelModal"
+                    data-id="${pendingData.job_request_id}"
+                    data-code="${pendingData.request_code}">
+                    Cancel
+                </button>
+            `;
+
+        }else{
+            buttonAccepted = `
+                <button class="btn btn-danger w-100 bubble-shadow" 
+                    onclick="handleAccept('${pendingData.job_request_id}', '${pendingData.request_code}','${pendingData.requester_name}','${pendingData.status}')">
+                    Accept
+                </button>
+            `;
+        }
 
         const taskItems = pendingData.description.split(',').map(task => `<li><label>${task.trim()}</label></li>`).join('');
         card.innerHTML = `
@@ -237,9 +246,9 @@
                         <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
                         <ul>${taskItems}</ul>
                     </div>
-                    <button class="btn btn-danger w-100 bubble-shadow" onclick="handleAccept('${modifiedKey}','${pendingData.job_request_id}', '${pendingData.request_code}','${pendingData.requester_name}')">
-                        Accept
-                    </button>
+
+                    ${buttonAccepted}
+                   
                 </div>
             </div>
         `;
@@ -325,7 +334,7 @@ TransferRequestsRef.on('child_added', (snapshot) => {
                             <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
                             <ul>${taskItems}</ul>
                         </div>
-                        <button class="btn btn-warning w-100 bubble-shadow" onclick="handleAccept('${requestKey}','${transferData.job_request_id}', '${transferData.request_code}','${transferData.requester_name}')">
+                        <button class="btn btn-warning w-100 bubble-shadow" onclick="handleAccept('${transferData.job_request_id}', '${transferData.request_code}','${transferData.requester_name}','${transferData.status}')">
                             Accept
                         </button>
                     </div>
@@ -335,12 +344,12 @@ TransferRequestsRef.on('child_added', (snapshot) => {
         }
     }
 
-    function handleAccept(requestKey, job_id, code, fullname) {
+    function handleAccept(job_id,code,fullname,transferred) {
         if (!job_id && !code) {
             console.error("job id and code is missing");
             return;
         }
-
+        
         fetch(`/technician/${job_id}/${code}/accept`, {
             method: 'POST',
             headers: {
@@ -348,7 +357,9 @@ TransferRequestsRef.on('child_added', (snapshot) => {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 'X-Requested-With': 'XMLHttpRequest' 
             },
-            body: JSON.stringify({})
+            body: JSON.stringify({
+                transfer: transferred
+            })
         })
         .then(response => {
             if (!response.ok) {
@@ -360,21 +371,25 @@ TransferRequestsRef.on('child_added', (snapshot) => {
             return response.json();
         })
         .then(data => {
-            console.log("accepted data now", data);
-               // Remove the request from the UI
-               let requestedCard = document.getElementById(`pending${requestKey}`);
-        
+            const divId = `pending${code}`;
+            const divPending = document.getElementById(divId);
+            console.log("value checkSample::", data)
             if(data.isAccepted === 1){
                 swal({
                         title: "Error!",
-                        text: "This Pending Request is Already accepted by other technician!",
+                        text: "This Pending Request is Already accepted or Cancelled!",
                         icon: "error",
                         button: "OK"
                     });
-                    console.log("requestedCard::", requestedCard);
-                    requestedCard.remove();
+
+                    if(divPending){
+                        divPending.remove();
+                    }
+                    // location.reload();
+                    return;
             }else{
                 if (data.success) {
+                    
                     swal({
                         title: "Success!",
                         text: `Request from ${data.fullname} is accepted`,
@@ -382,10 +397,12 @@ TransferRequestsRef.on('child_added', (snapshot) => {
                         button: "OK",
                         timer: 5000
                     });
-                    requestedCard.remove();
 
+                    if(divPending){
+                        divPending.remove();
+                    }
                     location.reload();
-                   
+                    return;
                 } else {
                     swal({
                         title: "Error!",
@@ -393,6 +410,7 @@ TransferRequestsRef.on('child_added', (snapshot) => {
                         icon: "error",
                         button: "OK"
                     });
+                    return;
                 }
             }
          
@@ -420,4 +438,6 @@ TransferRequestsRef.on('child_added', (snapshot) => {
         })
 
     }
+
+
 </script>

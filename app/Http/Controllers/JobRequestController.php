@@ -91,14 +91,30 @@ class JobRequestController extends Controller
 
     public function cancelRequest(Request $req, $id){
         $user = $req->get('currentUser');
-    
-            $act_req = new Activity_request();
-            $act_req->job_request_id = $id;
-            $act_req->request_code = $req->req_code;
-            $act_req->tech_from = $user->userid;
-            $act_req->status = "cancelled";
-            $act_req->remarks = $req->cancelRemarks;
-            $act_req->save();
-            return redirect()->route('currentRequest')->with('success', 'successfully cancelled request!');
+
+        $existing = Activity_request::where('job_request_id', $id)
+            ->whereIn('status', ['accepted', 'cancelled'])
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+            if ($existing) {
+                return response()->json([
+                    'status' => 'exists',
+                    'message' => 'This request has already been ' . $existing->status . '.'
+                ]);
+            }
+        
+        $act_req = new Activity_request();
+        $act_req->job_request_id = $id;
+        $act_req->request_code = $req->req_code;
+        $act_req->tech_from = $user->userid;
+        $act_req->status = "cancelled";
+        $act_req->remarks = $req->cancelRemarks;
+        $act_req->save();
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Successfully cancelled request!'
+        ]);
     }
 }

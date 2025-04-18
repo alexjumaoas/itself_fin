@@ -42,7 +42,7 @@
             <div class="modal-header">
                 <h5 class="modal-title" id="cancelModalLabel">Cancel Request</h5>
             </div>
-            <form id="cancelRequestForm" action="{{ route('requests.cancel', ':id') }}" method="POST">
+            <form id="cancelRequestForm">
                 @csrf
                 <input type="hidden" id="cancelJobId" name="id">
                 <input type="hidden" id="req_code" name="req_code">
@@ -69,5 +69,53 @@
             $('#cancelRequestModal').modal('hide');
             modalDialog.style.animation = "";
         }, 300);
+    }); 
+
+    $('#cancelRequestForm').on('submit', function (e) {
+        e.preventDefault();
+
+        const jobId = $('#cancelJobId').val();
+        const reqCode = $('#req_code').val();
+        const cancelRemarks = $('#cancelRemarks').val();
+        const token = $('input[name="_token"]').val();
+
+        $.ajax({
+            url:`/requests/${jobId}/cancel`,
+            type: 'POST',
+            data: {
+                _token: token,
+                req_code: reqCode,
+                cancelRemarks: cancelRemarks
+            },
+            success: function (response) {
+                if (response.status === 'exists') {
+                    $('#cancelRequestModal').modal('hide');
+                    swal({
+                        icon: 'warning',
+                        title: 'Warning',
+                        text: response.message,
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else if (response.status === 'success') {
+                    $('#cancelRequestModal').modal('hide');
+                    swal({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                    }).then(() => {
+                        location.reload();
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+                swal({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Something went wrong. Please try again.',
+                });
+            }
+        });
     });
 </script>

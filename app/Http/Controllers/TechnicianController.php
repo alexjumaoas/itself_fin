@@ -71,18 +71,26 @@ class TechnicianController extends Controller
 
     public function acceptRequest(Request $req, $id, $code)
     {
-            $latestaccepted =  Activity_request::where('request_code', $code)
-            ->where('status', 'accepted')
-            ->orderBy('created_at', 'desc')
+        $latestaccepted = Activity_request::where('request_code', $code)
+            ->where(function($query) {
+                $query->where('status', 'accepted')
+                    ->orWhere('status', 'cancelled')
+                    ->orWhere('status', 'transferred');
+            })
+            ->orderBy('id', 'desc')
             ->first();
-            
-            $hasaccepted = $latestaccepted ? 1 : 0;
            
+            $hasaccepted = ($latestaccepted && $latestaccepted->status != "transferred") ? 1 : 0;
+          
             $user = $req->get('currentUser');
-            if($hasaccepted === 0 || $req->hastransfer == 1){
+            if($hasaccepted === 0 || $req->transfer == 'transferred'){
              
                 $act_req = new Activity_request();
-                $act_req->tech_from = $user->userid;
+                if($req->transfer == 'transferred'){
+                    $act_req->tech_to = $user->userid;
+                }else{
+                    $act_req->tech_from = $user->userid;
+                }
                 $act_req->request_code = $code;
                 $act_req->job_request_id = $id;
                 $act_req->status = "accepted";
@@ -111,29 +119,24 @@ class TechnicianController extends Controller
                 session()->flash('firebaseData', $firebaseData);
 
                 if ($req->ajax() || $req->wantsJson()) {
-                    try {
-                        
                     return response()->json([
-                            'success' => true,
-                            'fullname' => $activityRequest->job_req->requester->fname . ' ' . $activityRequest->job_req->requester->lname,
-                            'message' => 'Successfully accepted request!',
-                            'firebaseData' => $firebaseData,
-                            'isAccepted' =>  $hasaccepted 
-                        ]);
-                    } catch (\Exception $e) {
-                        // Return JSON error response
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Error: ' . $e->getMessage()
-                        ], 500);
-                    }
+                        'success' => true,
+                        'fullname' => $activityRequest->job_req->requester->fname . ' ' . $activityRequest->job_req->requester->lname,
+                        'message' => 'Successfully accepted request!',
+                        'isAccepted' =>  $hasaccepted, 
+                        'issample' => $latestaccepted,
+                        'isampleCode' => $code,
+                        'firebaseData' => $firebaseData,
+                    ]);
                 }
 
-            }else{
+            }else {
                 if ($req->ajax() || $req->wantsJson()) {
                     return response()->json([
                         'success' => true,
-                        'isAccepted' =>  $hasaccepted 
+                        'isAccepted' =>  $hasaccepted,
+                        'issample' => $latestaccepted,
+                        'isampleCode' => $code,
                     ]);
                 }else{
                     return redirect()->route('technician.request');
@@ -200,6 +203,7 @@ class TechnicianController extends Controller
             'request_code' => $req->code,
             'tech_name' => $user->fname . ' ' . $user->lname,
             'tech_to' => $activity->tech_to,
+            'job_request_id' => $job_req->id,
             'description' => $job_req->description,
             'requester_name' => $activity->job_req->requester->fname . ' ' . $activity->job_req->requester->lname,
             'section' => $activity->job_req->requester->sectionRel->acronym,

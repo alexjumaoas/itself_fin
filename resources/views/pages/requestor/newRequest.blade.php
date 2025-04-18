@@ -128,8 +128,19 @@
                         </div>
                     </div>
                     @php
-                        $user = App\Models\Dtruser::where('username', $accepted->tech_from)->first();
+                       
                         $userto = App\Models\Dtruser::where('username', $accepted->tech_to)->first();
+
+                        $user = App\Models\Dtruser::where(function ($query) use ($accepted) {
+                        if (!empty($accepted->tech_from)) {
+                                $query->where('username', $accepted->tech_from);
+                            }
+
+                            if (!empty($accepted->tech_to)) {
+                                $query->orWhere('username', $accepted->tech_to);
+                            }
+                        })->first();
+
                     @endphp
                     <div class="card-footer text-center bubble-shadow" style="{{ $accepted->status == 'transferred' ? 'background-color: #ffad46; color: white; padding: 10px;' : 'background-color: #6861ce; color: white; padding: 10px;'}}">
                         @if($accepted->status == 'transferred')
@@ -167,12 +178,9 @@
 <script>
 
     function setCancelRequest(jobId, requestCode) {
-        console.log("requestCode", requestCode);
-        let form = document.getElementById('cancelRequestForm');
-        let action = form.getAttribute('action').replace(':id', jobId);
-        form.setAttribute('action', action);
-        document.getElementById('cancelJobId').value = jobId;
-        document.getElementById('req_code').value = requestCode;
+        console.log("Setting cancel form for ID:", jobId, "with code:", requestCode);
+        $('#cancelJobId').val(jobId);
+        $('#req_code').val(requestCode);
     }
 
     const firebaseConfig = {

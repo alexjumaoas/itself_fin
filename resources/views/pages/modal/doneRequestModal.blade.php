@@ -95,6 +95,8 @@ document.addEventListener("DOMContentLoaded", function () {
             modalDialog.style.animation = "";
         }, 300);
     });
+
+    
 });
 </script>
 
