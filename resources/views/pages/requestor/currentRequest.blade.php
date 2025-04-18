@@ -64,7 +64,7 @@
         @empty
             <!-- FOR CURRENT REQUEST, IF EMPTY OR NOT -->
             <div class="col-sm-6 col-md-12">
-                <div class="card card-stats card-danger card-round">
+                <div class="card card-stats card-round" style="background-color: #F69095; color: white;">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12">
