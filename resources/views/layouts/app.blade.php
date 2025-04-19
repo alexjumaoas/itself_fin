@@ -57,7 +57,7 @@
 
     <!-- DataTables Bootstrap 5 JS -->
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
-  
+
     <!-- Add to your blade layout or view -->
     <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-database-compat.js"></script>
@@ -69,9 +69,9 @@
         <!-- Sidebar -->
         <div class="sidebar" data-background-color="dark">
             <div class="sidebar-logo">
-                
+
                 <div class="logo-header" data-background-color="dark">
-                    
+
                         <a href="" class="logo">
                         <img
                             src="{{ asset('assets/img/kaiadmin/itself-icon.svg') }}"
@@ -94,7 +94,7 @@
                         <i class="gg-more-vertical-alt"></i>
                     </button>
                 </div>
-               
+
             </div>
             <div class="sidebar-wrapper scrollbar scrollbar-inner">
                 <div class="sidebar-content">
@@ -169,24 +169,9 @@
         @include('layouts.customTemplate')
     </div>
 
-        <script>
-                // // Your web app's Firebase configuration
-                // const firebaseConfig = {
-                //     apiKey: "AIzaSyD4AIwE7b1wCUAqgQKqTzYhTWZ1suEoL8Y",
-                //     authDomain: "itself-3c41c.firebaseapp.com",
-                //     databaseURL: "https://itself-3c41c-default-rtdb.asia-southeast1.firebasedatabase.app",
-                //     projectId: "itself-3c41c",
-                //     storageBucket: "itself-3c41c.firebasestorage.app",
-                //     messagingSenderId: "865081651173",
-                //     appId: "1:865081651173:web:124dff13445781cf4f890c",
-                //     measurementId: "G-JVFWD126DM"
-                // };
-                
-                // firebase.initializeApp(firebaseConfig);
-        </script>
     <!-- FlatPickr -->
     <script src="{{ asset('assets/js/flatpickr.min.js') }}"></script>
-    
+
     <!--   Core JS Files   -->
     <script src="{{ asset('assets/js/core/jquery-3.7.1.min.js') }}"></script>
     <script src="{{ asset('assets/js/core/popper.min.js') }}"></script>

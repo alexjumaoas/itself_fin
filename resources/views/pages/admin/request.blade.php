@@ -5,6 +5,14 @@
 use App\Models\Dtruser;
 
 ?>
+<style>
+    .alert[data-notify="container"] {
+        cursor: pointer;
+    }
+
+</style>
+
+
 <!-- PENDING CARDS -->
 <div class="row">
     <div class="page-header">
@@ -20,7 +28,7 @@ use App\Models\Dtruser;
         @php
             $user = App\Models\Dtruser::where('username', $pending->tech_from)->first();
         @endphp
-     
+
         @if($pending->status == "transferred" && (int) $userInfo->username === $pending->tech_to || $pending->status == "pending" )
 
             <div class="col-md-3">
@@ -79,7 +87,7 @@ use App\Models\Dtruser;
                                 <button class="btn btn-warning w-100 bubble-shadow" id="alert_demo_8">
                                     Accept
                                 </button>
-                            </form> 
+                            </form>
                     @else
                         <form id="acceptForm" style="margin-bottom: 0px;"
                                 action="{{ route('technician.accept', ['job' => $pending->job_req->id, 'code' => $pending->job_req->request_code]) }}"
@@ -89,7 +97,7 @@ use App\Models\Dtruser;
                                     @if(!$firstEnabled) disabled @endif>
                                     Accept
                                 </button>
-                            </form> 
+                            </form>
                             @php
                                 $firstEnabled = false; // Disable all other buttons after the first one
                             @endphp
@@ -102,7 +110,7 @@ use App\Models\Dtruser;
                             data-id="{{ $pending->job_req->id }}"
                             data-code="{{$pending->job_req->request_code}}">
                             Cancel
-                        </button> 
+                        </button>
                     @endif
                 </div>
 
@@ -217,7 +225,7 @@ use App\Models\Dtruser;
                     </div>
                     @else
                     <div class="card-footer text-center bubble-shadow" style="background-color: #6861ce; color: white; padding: 10px;">
-                       <strong>Accepted by : {{ $user ? $user->fname. ' ' . $user->mname. ' ' . $user->lname : 'N/A'}}</strong> 
+                       <strong>Accepted by : {{ $user ? $user->fname. ' ' . $user->mname. ' ' . $user->lname : 'N/A'}}</strong>
                     </div>
                     @endif
                 @endif
@@ -247,9 +255,9 @@ use App\Models\Dtruser;
         <h1 class="fw-bold mb-3">TRANSFERRED</h1>
     </div>
     <!-- PUT A FOR-LOOP CONTITION HERE -->
-    @forelse($job_transferred as $transferred) 
+    @forelse($job_transferred as $transferred)
        {{-- @foreach($transferred->transferedRequests as $trans) --}}
-           @if((int)$transferred->tech_from === (int)$userInfo->userid || $userInfo->usertype == 1)
+            @if((int)$transferred->tech_from === (int)$userInfo->userid || $userInfo->usertype == 1)
                 <div class="col-md-3">
                     <div class="card card-post card-round" style="border-top: 3px solid #ffad46;">
                         <div class="card-body">
@@ -307,7 +315,7 @@ use App\Models\Dtruser;
                         @endif
                     </div>
                 </div>
-            @endif 
+            @endif
         {{--@endforeach --}}
     @empty
         <!-- PUT CONDITION HERE FOR TRANSFER REQUEST, IF EMPTY OR NOT -->
@@ -325,11 +333,46 @@ use App\Models\Dtruser;
             </div>
         </div>
     @endforelse
-</div> 
-
+</div>
 
 @include('pages.modal.doneRequestModal')
 @include('pages.modal.transferModal')
 @include('pages.js.script')
 @include('pages.modal.cancelAdminReqModal')
+@include('pages.modal.transferReceiveModal')
+
+
+<button id="displayNotif" class="btn btn-success">Display</button>
+
+<script>
+    $(document).ready(function () {
+        $("#displayNotif").on("click", function () {
+            var notif = $.notify({
+                icon: 'fa fa-bell',
+                title: 'Transfer Request',
+                message: 'You have received a new incoming transfer request.',
+            }, {
+                type: 'warning',
+                placement: {
+                    from: 'bottom',
+                    align: 'right'
+                },
+                delay: 0,
+                timer: 0,
+                allow_dismiss: true,
+            });
+            setTimeout(function () {
+                $(".alert[data-notify='container']").on("click", function (e) {
+                    if (!$(e.target).is('[data-notify="dismiss"]') && !$(e.target).closest('[data-notify="dismiss"]').length) {
+                        $('#transferReceiveModal').modal('show');
+                    }
+                });
+            }, 100);
+        });
+    });
+</script>
+
+
+
+
 @endsection
