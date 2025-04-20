@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Technician;
 use App\Models\Dtruser;
@@ -11,6 +12,8 @@ use App\Models\Request_History;
 use App\Services\JobRequestService;
 use App\Models\Activity_request;
 use Illuminate\Support\Facades\Redirect;
+
+
 
 class AdminController extends Controller
 {
@@ -22,40 +25,9 @@ class AdminController extends Controller
         $this->jobRequestService = $jobRequestService;
     }
 
-    // public function index(){
-    //     // , 'division', 'section'
-    //     $dts_users = Dts_user::select('id', 'username', 'designation', 'division', 'section')
-    //         ->with([
-    //             'designationRel' => function ($query){
-
-    //                 $query->select('id', 'description');
-    //             },
-    //             'divisionRel' => function ($query){
-    //                 $query->select('id', 'description');
-    //             },
-    //             'sectionRel' => function ($query){
-    //                 $query->select('id', 'description');
-    //             },
-    //             'dtrUsers'
-    //             ])
-    //         ->where('division', 3)
-    //         ->where('section', 80)
-    //         ->orderBy('id','desc')
-    //         ->paginate(10);
-
-    //     // return view('pages.admin.technician', compact('dts_users'));
-    //     return view('pages.admin.display_tech', compact('dts_users'));
-    // }
-
     public function index(Request $req)
     {
-
-        $user = $req->get('currentUser'); 
-        // $pendingCount = Activity_request::where('status', 'pending')->count();
-        // $acceptedCount = Activity_request::where('status', 'accepted')->count();
-        // $cancelledCount = Activity_request::where('status', 'cancelled')->count();
-        // $completedCount = Activity_request::where('status', 'completed')->count();
-        // $completedCount = Activity_request::where('status', 'transferred')->count();
+        $user = $req->get('currentUser');
 
         $pendingCount = 0;
         $acceptedCount = 0;
@@ -81,12 +53,26 @@ class AdminController extends Controller
             $totalpending = $pendingCount + $traferredCount;
             $totalRequest = $totalpending  + $acceptedCount + $cancelledCount + $completedCount;
         }
-     
-        return view("pages.admin.dashboard", compact('totalpending', 'acceptedCount', 'completedCount','cancelledCount','traferredCount','totalRequest'));
+
+        //---------------------------------------------------------
+        $monthlyCompleted = Activity_request::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
+            ->where('status', 'completed')
+            ->groupBy(DB::raw('MONTH(created_at)'))
+            ->pluck('total', 'month')
+            ->toArray();
+
+        // Make sure all months are present (0 if no data)
+        $data = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $data[] = $monthlyCompleted[$i] ?? 0;
+        }
+        //---------------------------------------------------------
+
+        return view("pages.admin.dashboard", compact('totalpending', 'acceptedCount', 'completedCount','cancelledCount','traferredCount','totalRequest', 'data'));
     }
 
-    public function getAllTechnican(){
-
+    public function getAllTechnican()
+    {
 
         $dts_users = Dts_user::select('id', 'username', 'designation', 'division', 'section')
         ->with([
@@ -119,7 +105,8 @@ class AdminController extends Controller
         return view('pages.admin.display_tech', compact('technicians','dts_users'));
     }
 
-    public function SavedTechnician(Request $req){
+    public function SavedTechnician(Request $req)
+    {
 
         $userId = $req->username;
         $AddTech = Technician::where('userid',  $userId)->first();
@@ -132,7 +119,7 @@ class AdminController extends Controller
             $AddTech->userid = $userId;
             $AddTech->status = "active";
         }
-      
+
 
         $DtruserType = Dtruser::where('username', $userId)->first();
         $DtruserType->usertype = 2;
@@ -192,29 +179,46 @@ class AdminController extends Controller
         return Redirect::back()->with('success', 'Request cancelled successfully');
     }
 
-    public function checkRequestStatus(Request $req){
+    public function checkRequestStatus(Request $req)
+    {
 
         $requestId = $req->input('request_id');
         $existingStatus = Activity_request::where('job_request_id', $requestId)
-        
+
             ->orderByDesc('id')
             ->first();
-            
+
             if ($existingStatus) {
                 if ($existingStatus->status === "accepted") {
                     return response()->json(['status' => 'accepted', 'canCancel' => false, 'message' => 'This request has already been accepted.']);
                 }
-        
+
                 if ($existingStatus->status === "cancelled") {
                     return response()->json(['status' => 'cancelled', 'otherCancel' => false, 'message' => 'This request is already cancelled.']);
                 }
-        
+
                 return response()->json(['status' => $existingStatus->status, 'canCancel' => true]);
             }
-        
+
         return response()->json(['status' => $existingStatus ? $existingStatus->status : 'unknown', 'canCancel' => true]);
     }
 
+    // public function showChart()
+    // {
+    //     $monthlyCompleted = Activity_request::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
+    //         ->where('status', 'completed')
+    //         ->groupBy(DB::raw('MONTH(created_at)'))
+    //         ->pluck('total', 'month')
+    //         ->toArray();
+
+    //     // Make sure all months are present (0 if no data)
+    //     $data = [];
+    //     for ($i = 1; $i <= 12; $i++) {
+    //         $data[] = $monthlyCompleted[$i] ?? 0;
+    //     }
+
+    //     return view('pages.admin.dashboard', compact('data'));
+    // }
 
 
 }

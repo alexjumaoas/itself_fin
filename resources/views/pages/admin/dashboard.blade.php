@@ -279,24 +279,29 @@
     var myBarChart = new Chart(barChart, {
         type: "bar",
         data: {
-        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-        datasets: [{
-            label: "Request",
-            backgroundColor: "rgb(23, 125, 255)",
-            borderColor: "rgb(23, 125, 255)",
-            data: [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4],
-        }],
-        },
-        options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            yAxes: [{
-            ticks: {
-                beginAtZero: true,
-            },
+            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+            datasets: [{
+                label: "Request",
+                backgroundColor: "rgb(23, 125, 255)",
+                borderColor: "rgb(23, 125, 255)",
+                // data: [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4],
+                data: @json($data),
             }],
         },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        // stepSize: 1
+                        callback: function(value) {
+                            return Number.isInteger(value) ? value : null; // Only show whole numbers
+                        }
+                    },
+                }],
+            },
         },
     });
 
