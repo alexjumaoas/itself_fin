@@ -62,4 +62,6 @@ Route::get('/generate-excel', [ExcelReportController::class, 'generateExcel'])->
 
 Route::get('/generate-pdf/{request_code}', [PDFController::class, 'generatePDF'])->name('generate.pdf');
 
+Route::post('/generate-repair-steps', [TechnicianController::class, 'generateRepairSteps']);
+
 
