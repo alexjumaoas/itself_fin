@@ -158,9 +158,12 @@
     const pendingRequestsRef = database.ref('pendingRequests');
         
     pendingRequestsRef.on('child_added', (snapshot) => {
+        pendingRequestsArray = [];
         const requestData = snapshot.val();
         const requestKey = snapshot.key;
+        const data = snapshot.val();
 
+        pendingRequestsArray.push(data);
         console.log("pending requestKey:", requestData);
 
         // Call function to update UI
@@ -214,14 +217,18 @@
             `;
 
         }else{
+            console.log("pendingRequestsArray", pendingRequestsArray)
+            pendingRequestsArray.forEach((pendingData, index) => {
+                const isDisabled = index !== 0
             buttonAccepted = `
                 <button class="btn btn-danger w-100 bubble-shadow" 
                     onclick="handleAccept('${pendingData.job_request_id}', '${pendingData.request_code}','${pendingData.requester_name}','${pendingData.status}')"
-                    disabled
+                     ${isDisabled ? 'disabled' : ''}
                     >
                     Accept
                 </button>
             `;
+            });
         }
 
         const taskItems = pendingData.description.split(',').map(task => `<li><label>${task.trim()}</label></li>`).join('');
@@ -302,10 +309,33 @@ TransferRequestsRef.on('child_added', (snapshot) => {
     });
 
     function updateTransferRequestsUI(transferData,requestKey){
-  
-        if(transferData.tech_to === parseInt(user.username)){
+        console.log("admin transfer", transferData);
+        if(transferData.tech_transfer === parseInt(user.username) || user.usertype == 1){
+            let container = '';
+            if(user.usertype == 1){
+                container = document.querySelector("#transfer-requests-container");
+            }else{
+                container = document.querySelector("#pending-requests-container");
+            }
+        
+            let buttonTransfer = '';
 
-            let container = document.querySelector("#pending-requests-container");
+            if(user.usertype === 1){
+                buttonTransfer = `
+                    <div class="card-footer text-center bubble-shadow" style="background-color: #ffad46; color: white; padding: 10px;">
+                        <strong>Transferred from : ${transferData.tech_from}</strong><br>
+                        <strong>Transferred to : ${transferData.tech_to}</strong>
+                    </div>
+                `;
+
+            }else{
+        
+                buttonTransfer = `
+                    <button class="btn btn-warning w-100 bubble-shadow" onclick="handleAccept('${transferData.job_request_id}', '${transferData.request_code}','${transferData.requester_name}','${transferData.status}')">
+                        Accept
+                    </button>
+                `;
+            }
 
             let card = document.createElement("div");
             card.classList.add("col-md-3");
@@ -326,7 +356,7 @@ TransferRequestsRef.on('child_added', (snapshot) => {
                             </div>
                         </div>
                         <div class="separator-solid"></div>
-                        Transfer From <strong>: ${transferData.tech_name} </strong>
+                        Transfer From <strong>: ${transferData.tech_from} </strong>
                         <p class="card-category text-info mb-1">
                             <a>${new Date().toLocaleString()}</a>
                         </p>
@@ -337,9 +367,9 @@ TransferRequestsRef.on('child_added', (snapshot) => {
                             <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
                             <ul>${taskItems}</ul>
                         </div>
-                        <button class="btn btn-warning w-100 bubble-shadow" onclick="handleAccept('${transferData.job_request_id}', '${transferData.request_code}','${transferData.requester_name}','${transferData.status}')">
-                            Accept
-                        </button>
+
+                    ${buttonTransfer}
+                       
                     </div>
                 </div>
             `;

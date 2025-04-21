@@ -448,6 +448,8 @@ use App\Models\Dtruser;
     <div class="page-header" style="margin-bottom: 0; margin-top: 10px;">
         <h1 class="fw-bold mb-3">TRANSFERRED</h1>
     </div>
+
+    <div class="row" id="transfer-requests-container">
     <!-- PUT A FOR-LOOP CONTITION HERE -->
     @forelse($job_transferred as $transferred)
        {{-- @foreach($transferred->transferedRequests as $trans) --}}
@@ -562,6 +564,21 @@ use App\Models\Dtruser;
 
 
 <button id="displayNotif" class="btn btn-success">Display</button>
+
+@if(session('success'))
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        swal({
+            title: "Success!",
+            text: "{{ session('success') }}",
+            icon: "success",
+            timer: 3000,
+            button: "OK"
+        });
+    });
+</script>
+@endif
+
 
 <script>
     $(document).ready(function () {

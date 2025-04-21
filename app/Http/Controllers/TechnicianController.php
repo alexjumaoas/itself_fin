@@ -7,6 +7,7 @@ use App\Models\Job_request;
 use App\Models\Request_History;
 use App\Models\Technician;
 use App\Models\Transfered_Request;
+use App\Models\Dtruser;
 use App\Models\Activity_request;
 use Carbon\Carbon;
 use App\Services\JobRequestService;
@@ -140,7 +141,8 @@ class TechnicianController extends Controller
                         'isampleCode' => $code,
                     ]);
                 }else{
-                    return redirect()->route('technician.request');
+                    return redirect()->route('technician.request')->with('success', 'Successfully accepted request!');
+
                 }
             }   
 
@@ -198,12 +200,14 @@ class TechnicianController extends Controller
                 ->where('id', $tranferred->id)
                 ->where('status', 'transferred')
                 ->first();
-        // $techfrom = Dtruser::where('username', $activity->tech_from);
+        $techfrom = Dtruser::where('username', $activity->tech_from)->first();
+        $techto = Dtruser::where('username', $activity->tech_to)->first();
 
         $transferredData = [
             'request_code' => $req->code,
-            'tech_name' => $user->fname . ' ' . $user->lname,
-            'tech_to' => $activity->tech_to,
+            'tech_from' => $techfrom->fname . ' ' . $techfrom->lname,
+            'tech_to' => $techto->fname . ' ' . $techto->lname,
+            'tech_transfer' =>  $activity->tech_to,
             'job_request_id' => $job_req->id,
             'description' => $job_req->description,
             'requester_name' => $activity->job_req->requester->fname . ' ' . $activity->job_req->requester->lname,
