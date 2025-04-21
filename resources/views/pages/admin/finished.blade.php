@@ -139,7 +139,6 @@ a.btn {
                             <input type="text" class="form-control" id="dateGenerate" placeholder="Select Date Range">
                         </div>
                         <div class="form-group text-center">
-                            {{-- <button class="btn btn-secondary w-100">Generate</button> --}}
                             <a href="{{ route('generate.excel') }}" class="btn btn-secondary w-100">
                                 Generate Excel
                             </a>
