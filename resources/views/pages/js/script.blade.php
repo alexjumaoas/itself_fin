@@ -202,8 +202,8 @@
         let buttonAccepted = '';
         let card = document.createElement("div");
         card.classList.add("col-md-3");
-
-        card.id = `pending${pendingData.request_code}`;
+        const modifiedKey = requestKey.replace(/^[-]+/, '');
+        card.id = `pending${modifiedKey}`;
 
         if(user.usertype === 1){
             buttonAccepted = `
@@ -222,7 +222,7 @@
                 const isDisabled = index !== 0
             buttonAccepted = `
                 <button class="btn btn-danger w-100 bubble-shadow" 
-                    onclick="handleAccept('${pendingData.job_request_id}', '${pendingData.request_code}','${pendingData.requester_name}','${pendingData.status}')"
+                    onclick="handleAccept('${modifiedKey}','${pendingData.job_request_id}', '${pendingData.request_code}','${pendingData.requester_name}','${pendingData.status}')"
                      ${isDisabled ? 'disabled' : ''}
                     >
                     Accept
@@ -320,6 +320,8 @@ TransferRequestsRef.on('child_added', (snapshot) => {
         
             let buttonTransfer = '';
 
+            const modifiedKey = requestKey.replace(/^[-]+/, '');
+
             if(user.usertype === 1){
                 buttonTransfer = `
                     <div class="card-footer text-center bubble-shadow" style="background-color: #ffad46; color: white; padding: 10px;">
@@ -331,7 +333,7 @@ TransferRequestsRef.on('child_added', (snapshot) => {
             }else{
         
                 buttonTransfer = `
-                    <button class="btn btn-warning w-100 bubble-shadow" onclick="handleAccept('${transferData.job_request_id}', '${transferData.request_code}','${transferData.requester_name}','${transferData.status}')">
+                    <button class="btn btn-warning w-100 bubble-shadow" onclick="handleAccept('${modifiedKey}','${transferData.job_request_id}', '${transferData.request_code}','${transferData.requester_name}','${transferData.status}')">
                         Accept
                     </button>
                 `;
@@ -377,7 +379,7 @@ TransferRequestsRef.on('child_added', (snapshot) => {
         }
     }
 
-    function handleAccept(job_id,code,fullname,transferred) {
+    function handleAccept(modifiedKey,job_id,code,fullname,transferred) {
         if (!job_id && !code) {
             console.error("job id and code is missing");
             return;
@@ -404,7 +406,7 @@ TransferRequestsRef.on('child_added', (snapshot) => {
             return response.json();
         })
         .then(data => {
-            const divId = `pending${code}`;
+            const divId = `pending${modifiedKey}`;
             const divPending = document.getElementById(divId);
             console.log("value checkSample::", data)
             if(data.isAccepted === 1){
