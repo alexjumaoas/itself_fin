@@ -195,7 +195,7 @@
             }
         });
 
-        let container = document.querySelector("#pending-requests-container");
+        //let container = document.querySelector("#pending-requests-container");
         let buttonAccepted = '';
         let card = document.createElement("div");
         card.classList.add("col-md-3");
@@ -216,7 +216,9 @@
         }else{
             buttonAccepted = `
                 <button class="btn btn-danger w-100 bubble-shadow" 
-                    onclick="handleAccept('${pendingData.job_request_id}', '${pendingData.request_code}','${pendingData.requester_name}','${pendingData.status}')">
+                    onclick="handleAccept('${pendingData.job_request_id}', '${pendingData.request_code}','${pendingData.requester_name}','${pendingData.status}')"
+                    disabled
+                    >
                     Accept
                 </button>
             `;
@@ -252,7 +254,8 @@
                 </div>
             </div>
         `;
-       container.prepend(card);
+       //container.prepend(card);
+       $('#pending-requests-container').append(card);
        $('#pendingrequestEmpty').remove();
     }
 
@@ -439,5 +442,104 @@ TransferRequestsRef.on('child_added', (snapshot) => {
 
     }
 
+    var agawn_request_code = "";
+    $(document).ready(function() {
+    $('#aiRepairModal').on('show.bs.modal', function(event) {
+        const button = $(event.relatedTarget);
+        const requestType = button.data('request-type');
+        const requestCode = button.data('request-code');
+        agawn_request_code = requestCode;
+        const modal = $(this);
+        
+        // Generate repair steps based on request type
+        generateRepairSteps(requestType, requestCode, modal);
+    });
 
+    function generateRepairSteps(requestType, requestCode, modal) {
+        $.ajax({
+            url: '/generate-repair-steps',
+            method: 'POST',
+            data: {
+                request_type: requestType,
+                request_code: requestCode,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    modal.find('#repairStepsContainer').html(response.steps);
+                    modal.find('#markAsFixed, #needMoreHelp').show();
+                    
+                    // Add event listener for checkboxes
+                    modal.find('.step-checkbox').change(function() {
+                        if (modal.find('.step-checkbox:checked').length === modal.find('.step-checkbox').length) {
+                            modal.find('#markAsFixed').removeClass('btn-success').addClass('btn-primary')
+                                .html('<i class="fas fa-check-double"></i> All Steps Completed - Submit Resolution');
+                        } else {
+                            modal.find('#markAsFixed').addClass('btn-success').removeClass('btn-primary')
+                                .html('<i class="fas fa-check"></i> Mark as Fixed');
+                        }
+                    });
+                } else {
+                    modal.find('#repairStepsContainer').html(
+                        `<div class="alert alert-danger">Error: ${response.message}</div>`
+                    );
+                }
+            },
+            error: function() {
+                modal.find('#repairStepsContainer').html(
+                    `<div class="alert alert-danger">Failed to generate repair steps. Please try again.</div>`
+                );
+            }
+        });
+    }
+
+    $('#markAsFixed').click(function() {
+        const modal = $(this).closest('.modal');
+        const requestCode = modal.find('#requestCode').val();
+        
+        // Submit resolution to server
+        submitResolution(requestCode, modal);
+    });
+
+    $('#needMoreHelp').click(function() {
+        const modal = $(this).closest('.modal');
+        modal.find('#repairStepsContainer').append(`
+            <div class="mt-3">
+                <div class="form-group">
+                    <label>Describe the issue you're facing:</label>
+                    <textarea class="form-control" id="additionalHelpText" rows="3"></textarea>
+                </div>
+                <button id="requestMoreHelp" class="btn btn-info mt-2">
+                    <i class="fas fa-paper-plane"></i> Request Advanced Help
+                </button>
+            </div>
+        `);
+        
+        $('#requestMoreHelp').click(function() {
+            const helpText = $('#additionalHelpText').val();
+            if (!helpText) {
+                alert('Please describe your issue');
+                return;
+            }
+            
+            $.ajax({
+                url: '/request-advanced-help',
+                method: 'POST',
+                data: {
+                    request_code: agawn_request_code,
+                    help_text: helpText,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    modal.find('#repairStepsContainer').append(`
+                        <div class="alert alert-success mt-3">${response.message}</div>
+                    `);
+                },
+                error: function() {
+                    alert('Failed to submit help request');
+                }
+            });
+        });
+    });
+});
 </script>

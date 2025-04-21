@@ -11,6 +11,7 @@ use App\Models\Activity_request;
 use Carbon\Carbon;
 use App\Services\JobRequestService;
 use Illuminate\Support\Facades\Redirect;
+use App\Services\OpenAIService;
 
 class TechnicianController extends Controller
 {
@@ -232,5 +233,35 @@ class TechnicianController extends Controller
             'success' =>  $tatestaccepted
         ]);
 
-    }   
+    }
+    
+    public function generateRepairSteps(Request $request, OpenAIService $openAIService)
+    {
+        $request->validate([
+            'request_type' => 'required|string',
+            'request_code' => 'required|string'
+        ]);
+
+        try {
+            $prompt = "As an experienced IT technician, provide step-by-step troubleshooting guide for: " . 
+                    $request->input('request_type') . 
+                    // "\n\nFormat as HTML with checkboxes for each step. " .
+                    "\n\nFormat as HTML for each step. " .
+                    "Include common solutions or any requirements if needed" .
+                    "Keep it professional but easy to understand.";
+
+            $response = $openAIService->generateResponse($prompt);
+            
+            return response()->json([
+                'success' => true,
+                'steps' => $response
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error generating repair steps: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
 }   
