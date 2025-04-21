@@ -92,7 +92,7 @@ a.btn {
 <div class="row">
     <div class="col-md-3">
         <div class="row">
-            <div class="col-md-12">
+            {{-- <div class="col-md-12">
                 <div class="card">
                     <div class="card-header" style="background-color: #5867dd;">
                         <div class="card-title" style="color: white;">Filter</div>
@@ -127,26 +127,32 @@ a.btn {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header" style="background-color: #5867dd;">
                         <div class="card-title" style="color: white;">Generate Report</div>
                     </div>
                     <div class="card-body">
-                        <div class="form-group">
-                            <label for="dateGenerate">Date Range</label>
-                            <input type="text" class="form-control" id="dateGenerate" placeholder="Select Date Range">
-                        </div>
-                        <div class="form-group text-center">
-                            {{-- <button class="btn btn-secondary w-100">Generate</button> --}}
-                            <a href="{{ route('generate.excel') }}" class="btn btn-secondary w-100">
-                                Generate Excel
-                            </a>
-                        </div>
+                        <form id="reportForm" action="{{ route('generate.excel') }}" method="GET">
+                            <div class="form-group">
+                                <label for="dateGenerate">Date Range</label>
+                                <input type="text" name="date_range" class="form-control" id="dateGenerate" placeholder="Select Date Range" required>
+                                <div id="dateErrorClient" style="color: red; font-size: 0.875em; display: none;">Please select a date range before generating the report.</div>
+                                <div id="dateErrorServer" style="color: red; font-size: 0.875em; {{ session('error') ? '' : 'display: none;' }}">
+                                    {{ session('error') }}
+                                </div>
+                            </div>
+                            <div class="form-group text-center">
+                                <button type="submit" class="btn btn-secondary w-100">
+                                    Generate Excel
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -196,6 +202,19 @@ a.btn {
             dateFormat: "M j, Y",
         });
     });
+
+    document.getElementById('reportForm').addEventListener('submit', function(e) {
+        const dateRange = document.getElementById('dateGenerate').value.trim();
+        const errorDiv = document.getElementById('dateErrorClient');
+
+        if (!dateRange) {
+            e.preventDefault();
+            errorDiv.style.display = 'block';
+        } else {
+            errorDiv.style.display = 'none';
+        }
+    });
 </script>
+
 
 @endsection
