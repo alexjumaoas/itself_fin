@@ -189,7 +189,7 @@
     <div class="col-md-4">
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Line Chart</div>
+                <div class="card-title">Request Completion Time</div>
             </div>
             <div class="card-body">
                 <div class="chart-container">
@@ -202,7 +202,7 @@
     <div class="col-md-4">
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Bar Chart</div>
+                <div class="card-title">Request Per Month</div>
             </div>
             <div class="card-body">
                 <div class="chart-container">
@@ -215,7 +215,7 @@
     <div class="col-md-4">
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Pie Chart</div>
+                <div class="card-title">Request Status Distribution</div>
             </div>
             <div class="card-body">
                 <div class="chart-container">
@@ -237,7 +237,7 @@
         data: {
         labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
         datasets: [{
-            label: "Active Users",
+            label: "Average Completion Time (hours)",
             borderColor: "#1d7af3",
             pointBorderColor: "#FFF",
             pointBackgroundColor: "#1d7af3",

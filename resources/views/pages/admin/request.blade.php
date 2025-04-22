@@ -12,312 +12,309 @@ use App\Models\Dtruser;
 
     /* Main container styling */
     #repairStepsContainer {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    color: #333;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        color: #333;
     }
 
     /* Heading styles */
     #repairStepsContainer h1 {
-    color: #2c3e50;
-    border-bottom: 2px solid #3498db;
-    padding-bottom: 10px;
-    font-size: 28px;
-    margin-bottom: 20px;
+        color: #2c3e50;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+        font-size: 28px;
+        margin-bottom: 20px;
     }
 
     #repairStepsContainer h2 {
-    color: #34495e;
-    border-left: 4px solid #3498db;
-    padding-left: 10px;
-    font-size: 20px;
-    margin: 25px 0 15px 0;
-    background-color: #edf2f7;
-    padding: 8px 12px;
-    border-radius: 4px;
-    margin-top: -10px;
+        color: #34495e;
+        border-left: 4px solid #3498db;
+        padding-left: 10px;
+        font-size: 20px;
+        margin: 25px 0 15px 0;
+        background-color: #edf2f7;
+        padding: 8px 12px;
+        border-radius: 4px;
+        margin-top: -10px;
     }
 
     /* Paragraph styling */
     #repairStepsContainer p {
-    line-height: 1.6;
-    margin-bottom: 15px;
-    font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 15px;
+        font-size: 16px;
     }
 
     /* Form and checkbox styling */
     #repairStepsContainer form {
-    margin-bottom: 20px;
+        margin-bottom: 20px;
     }
 
     /* Checkbox container */
     #repairStepsContainer form div.checkbox-item {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 10px;
-    padding: 6px 10px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 10px;
+        padding: 6px 10px;
+        border-radius: 4px;
+        transition: background-color 0.2s;
     }
 
     #repairStepsContainer form div.checkbox-item:hover {
-    background-color: #edf7fd;
+        background-color: #edf7fd;
     }
 
     /* Custom checkbox styling */
     #repairStepsContainer input[type="checkbox"] {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    width: 18px;
-    height: 18px;
-    border: 2px solid #3498db;
-    border-radius: 3px;
-    margin-right: 10px;
-    margin-top: 3px;
-    position: relative;
-    cursor: pointer;
-    flex-shrink: 0;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid #3498db;
+        border-radius: 3px;
+        margin-right: 10px;
+        margin-top: 3px;
+        position: relative;
+        cursor: pointer;
+        flex-shrink: 0;
     }
 
     #repairStepsContainer input[type="checkbox"]:checked {
-    background-color: #3498db;
+        background-color: #3498db;
     }
 
     #repairStepsContainer input[type="checkbox"]:checked::before {
-    content: '✓';
-    position: absolute;
-    color: white;
-    font-size: 14px;
-    font-weight: bold;
-    left: 3px;
-    top: -3px;
+        content: '✓';
+        position: absolute;
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+        left: 3px;
+        top: -3px;
     }
 
     /* Label styling */
     #repairStepsContainer label {
-    cursor: pointer;
-    font-size: 15px;
-    line-height: 1.5;
-    display: inline-block;
-    width: calc(100% - 30px);
+        cursor: pointer;
+        font-size: 15px;
+        line-height: 1.5;
+        display: inline-block;
+        width: calc(100% - 30px);
     }
 
     /* Form controls styling */
     #repairStepsContainer .form-control {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-bottom: 15px;
-    font-family: inherit;
-    resize: vertical;
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        font-family: inherit;
+        resize: vertical;
     }
 
     /* Button styling */
     #repairStepsContainer .btn {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
     }
 
     #repairStepsContainer .btn-info {
-    background-color: #3498db;
-    color: white;
+        background-color: #3498db;
+        color: white;
     }
 
     #repairStepsContainer .btn-info:hover {
-    background-color: #2980b9;
+        background-color: #2980b9;
     }
 
     /* Icons */
     #repairStepsContainer .fas {
-    margin-right: 8px;
+        margin-right: 8px;
     }
 
     /* Divider between sections */
     #repairStepsContainer hr {
-    border: 0;
-    height: 1px;
-    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
-    margin: 20px 0;
+        border: 0;
+        height: 1px;
+        background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
+        margin: 20px 0;
     }
 
     /* Additional help section */
     #repairStepsContainer .mt-3 {
-    margin-top: 20px;
-    background-color: #edf7fd;
-    padding: 15px;
-    border-radius: 8px;
-    border-left: 4px solid #3498db;
+        margin-top: 20px;
+        background-color: #edf7fd;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #3498db;
     }
 
     /* Fix duplicate help section - show only the first one */
     #repairStepsContainer .mt-3:nth-of-type(2) {
-    display: none;
+        display: none;
     }
 
     /* Form group styling */
     #repairStepsContainer .form-group {
-    margin-bottom: 15px;
+        margin-bottom: 15px;
     }
 
     #repairStepsContainer .form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #2c3e50;
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
     }
 
     /* Responsive design */
     @media (max-width: 600px) {
-    #repairStepsContainer {
-        padding: 15px;
-    }
-    
-    #repairStepsContainer h1 {
-        font-size: 24px;
-    }
-    
-    #repairStepsContainer h2 {
-        font-size: 18px;
-    }
+        #repairStepsContainer {
+            padding: 15px;
+        }
+        
+        #repairStepsContainer h1 {
+            font-size: 24px;
+        }
+        
+        #repairStepsContainer h2 {
+            font-size: 18px;
+        }
     }
 
 </style>
 
 
 <!-- PENDING CARDS -->
-<div class="row">
+<div class="row" id="pending-requests-container">
     <div class="page-header">
         <h1 class="fw-bold">PENDING</h1>
     </div>
     @php
         $firstEnabled = true; // Enable only the first pending job
     @endphp
-    <div class="row" id="pending-requests-container">
-        <!-- Real-time pending cards will appear here -->
-    
-        @forelse($job_pending as $pending)
-            @php
-                $user = App\Models\Dtruser::where('username', $pending->tech_from)->first();
-            @endphp
+    <!-- Real-time pending cards will appear here -->
+    @forelse($job_pending as $pending)
+        @php
+            $user = App\Models\Dtruser::where('username', $pending->tech_from)->first();
+        @endphp
 
-            @if($pending->status == "transferred" && (int) $userInfo->username === $pending->tech_to || $pending->status == "pending" )
+        @if($pending->status == "transferred" && (int) $userInfo->username === $pending->tech_to || $pending->status == "pending" )
 
-                <div class="col-md-3">
-                    <div class="card card-post card-round" style="border-top: 3px solid #f25961;">
-                        <div class="card-body">
-                            <div class="d-flex">
-                                <div class="avatar">
-                                    <img src="{{ asset('assets/img/profile2.jpg') }}" alt="..." class="avatar-img rounded-circle">
-                                </div>
-                                <div class="info-post ms-2">
-                                    <p class="username"> {{$pending->job_req->requester->fname . ' ' . $pending->job_req->requester->lname}} </p>
-                                    <p class="date text-muted">{{$pending->job_req->requester->sectionRel->acronym}} Section {{ $pending->job_req->requester->divisionRel->description}}</p>
-                                </div>
+            <div class="col-md-3">
+                <div class="card card-post card-round" style="border-top: 3px solid #f25961;">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="avatar">
+                                <img src="{{ asset('assets/img/profile2.jpg') }}" alt="..." class="avatar-img rounded-circle">
                             </div>
-                            <div class="separator-solid"></div>
-                            @if($userInfo->usertype === 2)
-                                @if($pending->status == "transferred")
-                                    Transfer From <strong>: {{ $user ? $user->fname. ' ' . $user->mname. ' ' . $user->lname : 'N/A'}}</strong>
-                                @endif
-                            @endif
-                            <p class="card-category text-info mb-1">
-                                <a>{{ \Carbon\Carbon::parse($pending->job_req->request_date)->format('F d, Y h:i A') }}</a>
-                            </p>
-                            <h3 class="card-title">
-                                <a>{{$pending->request_code}} </a>
-                            </h3>
-                            <div>
-                                <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
-                                <ul>
-                                @php
-                                    $tasks = explode(',', $pending->job_req->description);
-                                    $tasks = array_map('trim', $tasks); // Trim whitespace from each item
-                                @endphp
-                                @foreach($tasks as $index => $task)
-                                    @if($task === 'Others' && isset($tasks[$index + 1]))
-                                        <li>
-                                            <label>Others:</label>
-                                            {{ $tasks[$index + 1] }}
-                                        </li>
-                                    @elseif($index === 0 || ($tasks[$index - 1] !== 'Others'))
-                                        <li>
-                                            <label>{{ $task }}</label>
-                                        </li>
-                                    @endif
-                                @endforeach
-                                </ul>
+                            <div class="info-post ms-2">
+                                <p class="username"> {{$pending->job_req->requester->fname . ' ' . $pending->job_req->requester->lname}} </p>
+                                <p class="date text-muted">{{$pending->job_req->requester->sectionRel->acronym}} Section {{ $pending->job_req->requester->divisionRel->description}}</p>
                             </div>
                         </div>
+                        <div class="separator-solid"></div>
                         @if($userInfo->usertype === 2)
-                        @if($pending->status == "transferred")
-                                <form id="acceptForm" style="margin-bottom: 0px;"
-                                    action="{{ route('technician.accept', ['job' => $pending->job_req->id, 'code' => $pending->job_req->request_code]) }}"
-                                    method="POST">
-                                    @csrf
-                                    <input type="hidden" name="hastransfer" value="1">
-                                    <button class="btn btn-warning w-100 bubble-shadow" id="alert_demo_8">
-                                        Accept
-                                    </button>
-                                </form>
-                        @else
-                            <form id="acceptForm" style="margin-bottom: 0px;"
-                                    action="{{ route('technician.accept', ['job' => $pending->job_req->id, 'code' => $pending->job_req->request_code]) }}"
-                                    method="POST">
-                                    @csrf
-                                    <button class="btn btn-danger w-100 bubble-shadow" id="alert_demo_8"
-                                        @if(!$firstEnabled) disabled @endif>
-                                        Accept
-                                    </button>
-                                </form>
-                                @php
-                                    $firstEnabled = false; // Disable all other buttons after the first one
-                                @endphp
+                            @if($pending->status == "transferred")
+                                Transfer From <strong>: {{ $user ? $user->fname. ' ' . $user->mname. ' ' . $user->lname : 'N/A'}}</strong>
+                            @endif
                         @endif
-                        @endif
-                        @if($userInfo->usertype === 1)
-                            <button class="btn btn-danger w-100 bubble-shadow"
-                                data-bs-toggle="modal"
-                                data-bs-target="#cancelModal"
-                                data-id="{{ $pending->job_req->id }}"
-                                data-code="{{$pending->job_req->request_code}}">
-                                Cancel
-                            </button>
-                        @endif
+                        <p class="card-category text-info mb-1">
+                            <a>{{ \Carbon\Carbon::parse($pending->job_req->request_date)->format('F d, Y h:i A') }}</a>
+                        </p>
+                        <h3 class="card-title">
+                            <a>{{$pending->request_code}} </a>
+                        </h3>
+                        <div>
+                            <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
+                            <ul>
+                            @php
+                                $tasks = explode(',', $pending->job_req->description);
+                                $tasks = array_map('trim', $tasks); // Trim whitespace from each item
+                            @endphp
+                            @foreach($tasks as $index => $task)
+                                @if($task === 'Others' && isset($tasks[$index + 1]))
+                                    <li>
+                                        <label>Others:</label>
+                                        {{ $tasks[$index + 1] }}
+                                    </li>
+                                @elseif($index === 0 || ($tasks[$index - 1] !== 'Others'))
+                                    <li>
+                                        <label>{{ $task }}</label>
+                                    </li>
+                                @endif
+                            @endforeach
+                            </ul>
+                        </div>
                     </div>
-
+                    @if($userInfo->usertype === 2)
+                    @if($pending->status == "transferred")
+                            <form id="acceptForm" style="margin-bottom: 0px;"
+                                action="{{ route('technician.accept', ['job' => $pending->job_req->id, 'code' => $pending->job_req->request_code]) }}"
+                                method="POST">
+                                @csrf
+                                <input type="hidden" name="hastransfer" value="1">
+                                <button class="btn btn-warning w-100 bubble-shadow" id="alert_demo_8">
+                                    Accept
+                                </button>
+                            </form>
+                    @else
+                        <form id="acceptForm" style="margin-bottom: 0px;"
+                                action="{{ route('technician.accept', ['job' => $pending->job_req->id, 'code' => $pending->job_req->request_code]) }}"
+                                method="POST">
+                                @csrf
+                                <button class="btn btn-danger w-100 bubble-shadow" id="alert_demo_8"
+                                    @if(!$firstEnabled) disabled @endif>
+                                    Accept
+                                </button>
+                            </form>
+                            @php
+                                $firstEnabled = false; // Disable all other buttons after the first one
+                            @endphp
+                    @endif
+                    @endif
+                    @if($userInfo->usertype === 1)
+                        <button class="btn btn-danger w-100 bubble-shadow"
+                            data-bs-toggle="modal"
+                            data-bs-target="#cancelModal"
+                            data-id="{{ $pending->job_req->id }}"
+                            data-code="{{$pending->job_req->request_code}}">
+                            Cancel
+                        </button>
+                    @endif
                 </div>
-            @endif
-        @empty
-            <!-- FOR ONGOING REQUEST, IF EMPTY OR NOT -->
-            <div class="col-sm-6 col-md-12" id="pendingrequestEmpty">
-                <div class="card card-stats card-round" style="background-color: #B8E7BA;">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="timeline-heading">
-                                    <h4 class="timeline-title">There are no PENDING request</h4>
-                                </div>
+
+            </div>
+        @endif
+    @empty
+        <!-- FOR ONGOING REQUEST, IF EMPTY OR NOT -->
+        <div class="col-sm-6 col-md-12" id="pendingrequestEmpty">
+            <div class="card card-stats card-round" style="background-color: #B8E7BA;">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="timeline-heading">
+                                <h4 class="timeline-title">There are no PENDING request</h4>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        @endforelse
-    </div>
+        </div>
+    @endforelse
 </div>
 
 <!-- ONGOING CARDS -->
@@ -403,14 +400,14 @@ use App\Models\Dtruser;
                     </div>
                 @else
                     @if($accepted->tech_from == $userInfo->userid || $accepted->tech_to == $userInfo->userid)
-                    <div class="card-footer text-center bubble-shadow" style="background-color: #6861ce; color: white; padding: 10px; cursor: pointer"
+                    <div class="card-footer text-center bubble-shadow" style="background-color: #6861ce; color: white; padding: 5px; cursor: pointer"
                         data-code='{{$accepted->job_req->request_code}}'
                         data-id = '{{$accepted->job_req->id}}'
                         data-bs-toggle="modal" data-bs-target="#technicianModal">
                         Done
                     </div>
-                    <button class="text-center btn btn-primary mt-2 ms-2"
-                        style="color: white;"
+                    <button class="card-footer text-center bubble-shadow btn btn-primary mt-1"
+                        style="color: white; padding: 5px;"
                         data-bs-toggle="modal" data-bs-target="#aiRepairModal"
                         title="AI Repair Assistant"
                         data-request-type="{{ $accepted->job_req->description }}"
@@ -444,75 +441,72 @@ use App\Models\Dtruser;
 </div>
 
 <!-- TRANSFER CARDS -->
-<div class="row">
+<div class="row" id="transfer-requests-container">
     <div class="page-header" style="margin-bottom: 0; margin-top: 10px;">
         <h1 class="fw-bold mb-3">TRANSFERRED</h1>
     </div>
 
-    <div class="row" id="transfer-requests-container">
     <!-- PUT A FOR-LOOP CONTITION HERE -->
     @forelse($job_transferred as $transferred)
-       {{-- @foreach($transferred->transferedRequests as $trans) --}}
-            @if((int)$transferred->tech_from === (int)$userInfo->userid || $userInfo->usertype == 1)
-                <div class="col-md-3">
-                    <div class="card card-post card-round" style="border-top: 3px solid #ffad46;">
-                        <div class="card-body">
-                            <div class="d-flex">
-                                <div class="avatar">
-                                    <img src="{{ asset('assets/img/profile2.jpg') }}" alt="..." class="avatar-img rounded-circle">
-                                </div>
-                                <div class="info-post ms-2">
-                                    <p class="username"> {{$transferred->job_req->requester->fname . ' ' . $transferred->job_req->requester->lnamee}}</p>
-                                    <p class="date text-muted">{{$transferred->job_req->requester->sectionRel->acronym}} Section {{ $transferred->job_req->requester->divisionRel->description}}</p>
-                                </div>
+        @if((int)$transferred->tech_from === (int)$userInfo->userid || $userInfo->usertype == 1)
+            <div class="col-md-3">
+                <div class="card card-post card-round" style="border-top: 3px solid #ffad46;">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="avatar">
+                                <img src="{{ asset('assets/img/profile2.jpg') }}" alt="..." class="avatar-img rounded-circle">
                             </div>
-                            <div class="separator-solid"></div>
-                            <p class="card-category text-info mb-1">
-                                <a>{{\Carbon\Carbon::parse($transferred->job_req->request_date)->format('F d, Y h:i A')}}</a>
-                            </p>
-                            <h3 class="card-title">
-                                <a>{{$transferred->request_code}}</a>
-                            </h3>
-                            <div>
-                                <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
-                                <ul>
-                                @php
-                                    $tasks = explode(',', $transferred->job_req->description);
-                                    $tasks = array_map('trim', $tasks); // Trim whitespace from each item
-                                @endphp
-                                @foreach($tasks as $index => $task)
-                                    @if($task === 'Others' && isset($tasks[$index + 1]))
-                                        <li>
-                                            <label>Others:</label>
-                                            {{ $tasks[$index + 1] }}
-                                        </li>
-                                    @elseif($index === 0 || ($tasks[$index - 1] !== 'Others'))
-                                        <li>
-                                            <label>{{ $task }}</label>
-                                        </li>
-                                    @endif
-                                @endforeach
-                                </ul>
+                            <div class="info-post ms-2">
+                                <p class="username"> {{$transferred->job_req->requester->fname . ' ' . $transferred->job_req->requester->lnamee}}</p>
+                                <p class="date text-muted">{{$transferred->job_req->requester->sectionRel->acronym}} Section {{ $transferred->job_req->requester->divisionRel->description}}</p>
                             </div>
                         </div>
-                        @php
-                            $dtrUser = Dtruser::where('userid',$transferred->tech_from)->first();
-                            $dtrUser_to = Dtruser::where('userid',$transferred->tech_to)->first();
-                        @endphp
-                        @if($userInfo->usertype == 1)
-                            <div class="card-footer text-center bubble-shadow" style="background-color: #ffad46; color: white; padding: 10px;">
-                                <strong>Transferred from : {{ $dtrUser ? $dtrUser->fname . ' ' . $dtrUser->lname : 'N/A' }}</strong><br>
-                                <strong>Transferred to : {{ $dtrUser_to ? $dtrUser_to->fname . ' ' . $dtrUser_to->lname : 'N/A' }}</strong>
-                            </div>
-                        @else
-                            <div class="card-footer text-center bubble-shadow" style="background-color: #ffad46; color: white; padding: 10px;">
-                                <strong>Transferred to : {{ $dtrUser_to ? $dtrUser_to->fname . ' ' . $dtrUser_to->lname : 'N/A' }}</strong><br>
-                            </div>
-                        @endif
+                        <div class="separator-solid"></div>
+                        <p class="card-category text-info mb-1">
+                            <a>{{\Carbon\Carbon::parse($transferred->job_req->request_date)->format('F d, Y h:i A')}}</a>
+                        </p>
+                        <h3 class="card-title">
+                            <a>{{$transferred->request_code}}</a>
+                        </h3>
+                        <div>
+                            <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
+                            <ul>
+                            @php
+                                $tasks = explode(',', $transferred->job_req->description);
+                                $tasks = array_map('trim', $tasks); // Trim whitespace from each item
+                            @endphp
+                            @foreach($tasks as $index => $task)
+                                @if($task === 'Others' && isset($tasks[$index + 1]))
+                                    <li>
+                                        <label>Others:</label>
+                                        {{ $tasks[$index + 1] }}
+                                    </li>
+                                @elseif($index === 0 || ($tasks[$index - 1] !== 'Others'))
+                                    <li>
+                                        <label>{{ $task }}</label>
+                                    </li>
+                                @endif
+                            @endforeach
+                            </ul>
+                        </div>
                     </div>
+                    @php
+                        $dtrUser = Dtruser::where('userid',$transferred->tech_from)->first();
+                        $dtrUser_to = Dtruser::where('userid',$transferred->tech_to)->first();
+                    @endphp
+                    @if($userInfo->usertype == 1)
+                        <div class="card-footer text-center bubble-shadow" style="background-color: #ffad46; color: white; padding: 10px;">
+                            <strong>Transferred from : {{ $dtrUser ? $dtrUser->fname . ' ' . $dtrUser->lname : 'N/A' }}</strong><br>
+                            <strong>Transferred to : {{ $dtrUser_to ? $dtrUser_to->fname . ' ' . $dtrUser_to->lname : 'N/A' }}</strong>
+                        </div>
+                    @else
+                        <div class="card-footer text-center bubble-shadow" style="background-color: #ffad46; color: white; padding: 10px;">
+                            <strong>Transferred to : {{ $dtrUser_to ? $dtrUser_to->fname . ' ' . $dtrUser_to->lname : 'N/A' }}</strong><br>
+                        </div>
+                    @endif
                 </div>
-            @endif
-        {{--@endforeach --}}
+            </div>
+        @endif
     @empty
         <!-- PUT CONDITION HERE FOR TRANSFER REQUEST, IF EMPTY OR NOT -->
         <div class="col-sm-6 col-md-12">
@@ -531,54 +525,28 @@ use App\Models\Dtruser;
     @endforelse
 </div>
 
-
-<div class="modal fade" id="aiRepairModal" tabindex="-1" aria-labelledby="aiRepairModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="aiRepairModalLabel">AI Repair Assistant</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="repairStepsContainer">
-                    <div class="text-center">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <p>Generating repair guide...</p>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 @include('pages.modal.doneRequestModal')
 @include('pages.modal.transferModal')
 @include('pages.js.script')
 @include('pages.modal.cancelAdminReqModal')
 @include('pages.modal.transferReceiveModal')
-
+@include('pages.modal.aiRepairModal')
 
 <button id="displayNotif" class="btn btn-success">Display</button>
 
 @if(session('success'))
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        swal({
-            title: "Success!",
-            text: "{{ session('success') }}",
-            icon: "success",
-            timer: 3000,
-            button: "OK"
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            swal({
+                title: "Success!",
+                text: "{{ session('success') }}",
+                icon: "success",
+                timer: 3000,
+                button: "OK"
+            });
         });
-    });
-</script>
+    </script>
 @endif
-
 
 <script>
     $(document).ready(function () {
@@ -607,8 +575,5 @@ use App\Models\Dtruser;
         });
     });
 </script>
-
-
-
 
 @endsection

@@ -254,11 +254,9 @@
                     <div>
                         <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
                         <ul>${taskItems}</ul>
-                    </div>
-
-                    ${buttonAccepted}
-                   
+                    </div> 
                 </div>
+                 ${buttonAccepted}
             </div>
         `;
        //container.prepend(card);
