@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class JobRequestService
 {
-    public function getJobRequestByStatus($status, $technicianId = null)
+    public function getJobRequestByStatus($status, $technicianId = null, $requester_id = null)
     {
 
         $latestIds = Activity_request::select(DB::raw('MAX(id) as max_id'))
@@ -28,6 +28,13 @@ class JobRequestService
                 $query->where('tech_from', $technicianId); // Filter by tech_from for all other statuses
             }
         }
+        if($requester_id){
+            $query->where('requester_id', $requester_id);
+        }
+
+        // if($requester_id){
+
+        // }
       
         return $query->with('job_req.requester.divisionRel', 'job_req.requester.sectionRel')
         ->get();

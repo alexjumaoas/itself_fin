@@ -54,43 +54,43 @@ class TechnicianController extends Controller
             ->orderBy('id', 'desc')
             ->first();
 
-        $hasaccepted = ($latestaccepted && $latestaccepted->status != "transferred") ? 1 : 0;
-
-        $user = $req->get('currentUser');
-        if($hasaccepted === 0 || $req->transfer == 'transferred'){
-
-            $act_req = new Activity_request();
-            if($req->transfer == 'transferred'){
-                $act_req->tech_to = $user->userid;
-            }else{
-                $act_req->tech_from = $user->userid;
-            }
-            $act_req->request_code = $code;
-            $act_req->job_request_id = $id;
-            $act_req->status = "accepted";
-            $act_req->save();
-
             $job_req = Job_request::where('request_code', $code)->first();
 
+            $hasaccepted = ($latestaccepted && $latestaccepted->status != "transferred") ? 1 : 0;
 
-            $activityRequest = Activity_request::with(['job_req.requester.sectionRel', 'job_req.requester.divisionRel'])
-            ->where('id', $act_req->id)
-            ->first();
+            $user = $req->get('currentUser');
+            if($hasaccepted === 0 || $req->transfer == 'transferred'){
 
-            $firebaseData = [
-                'request_code' => $code,
-                'tech_name' => $user->fname . ' ' . $user->lname,
-                'tech_id' => $user->userid,
-                'description' => $job_req->description,
-                'requester_name' => $activityRequest->job_req->requester->fname . ' ' . $activityRequest->job_req->requester->lname,
-                'section' => $activityRequest->job_req->requester->sectionRel->acronym,
-                'division' => $activityRequest->job_req->requester->divisionRel->description,
-                'timestamp' => Carbon::now()->toIso8601String(),
-                'status' => 'accepted'
-            ];
+                $act_req = new Activity_request();
+                if($req->transfer == 'transferred'){
+                    $act_req->tech_to = $user->userid;
+                }else{
+                    $act_req->tech_from = $user->userid;
+                }
+                $act_req->request_code = $code;
+                $act_req->requester_id = $job_req->requester_id;
+                $act_req->job_request_id = $id;
+                $act_req->status = "accepted";
+                $act_req->save();
 
-            session()->flash('success', 'Successfully accepted request!');
-            session()->flash('firebaseData', $firebaseData);
+                $activityRequest = Activity_request::with(['job_req.requester.sectionRel', 'job_req.requester.divisionRel'])
+                ->where('id', $act_req->id)
+                ->first();
+
+                $firebaseData = [
+                    'request_code' => $code,
+                    'tech_name' => $user->fname . ' ' . $user->lname,
+                    'tech_id' => $user->userid,
+                    'description' => $job_req->description,
+                    'requester_name' => $activityRequest->job_req->requester->fname . ' ' . $activityRequest->job_req->requester->lname,
+                    'section' => $activityRequest->job_req->requester->sectionRel->acronym,
+                    'division' => $activityRequest->job_req->requester->divisionRel->description,
+                    'timestamp' => Carbon::now()->toIso8601String(),
+                    'status' => 'accepted'
+                ];
+
+                session()->flash('success', 'Successfully accepted request!');
+                session()->flash('firebaseData', $firebaseData);
 
             if ($req->ajax() || $req->wantsJson()) {
                 return response()->json([
@@ -131,9 +131,11 @@ class TechnicianController extends Controller
     public function done(Request $req){
 
         $user = $req->get('currentUser');
+        $job_req = Job_request::where('request_code', $req->code)->first();
 
         $done_req = new Activity_request();
         $done_req->tech_from = $user->userid;
+        $done_req->requester_id = $job_req->requester_id;
         $done_req->request_code = $req->code;
         $done_req->job_request_id = $req->request_id;
         $done_req->status = "completed";
