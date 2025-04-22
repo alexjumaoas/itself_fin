@@ -24,12 +24,14 @@ class JobRequestController extends Controller
      }
  
 
-    public function index()
+    public function index(Request $req)
     {
-        $activity_reqs = $this->jobRequestService->getJobRequestByStatus('pending');
-        $activity_acept = $this->jobRequestService->getJobRequestByStatus('accepted')
-            ->merge($this->jobRequestService->getJobRequestByStatus('transferred'));
-    
+        $user = $req->get('currentUser');
+        $activity_reqs = $this->jobRequestService->getJobRequestByStatus('pending',null,$user->username);
+        $activity_finish = $this->jobRequestService->getJobRequestByStatus('completed',null,$user->username);
+        $activity_acept = $this->jobRequestService->getJobRequestByStatus('accepted',null,$user->username)
+            ->merge($this->jobRequestService->getJobRequestByStatus('transferred',null,$user->username));
+     
         return view('pages.requestor.newRequest', compact('activity_reqs','activity_acept'));
     }
     
@@ -66,6 +68,7 @@ class JobRequestController extends Controller
 
         $activity = new Activity_request();
         $activity->job_request_id = $request_it->id;
+        $activity->requester_id = $user->username;
         $activity->request_code = $request_it->request_code;
         $activity->status = "pending";
         $activity->save();
@@ -103,9 +106,12 @@ class JobRequestController extends Controller
                     'message' => 'This request has already been ' . $existing->status . '.'
                 ]);
             }
+
+        $job_req = Job_request::where('request_code', $req->req_code)->first();
         
         $act_req = new Activity_request();
         $act_req->job_request_id = $id;
+        $act_req->requester_id = $job_req->requester_id;
         $act_req->request_code = $req->req_code;
         $act_req->tech_from = $user->userid;
         $act_req->status = "cancelled";

@@ -81,6 +81,8 @@ class TechnicianController extends Controller
             })
             ->orderBy('id', 'desc')
             ->first();
+
+            $job_req = Job_request::where('request_code', $code)->first();
            
             $hasaccepted = ($latestaccepted && $latestaccepted->status != "transferred") ? 1 : 0;
           
@@ -94,12 +96,10 @@ class TechnicianController extends Controller
                     $act_req->tech_from = $user->userid;
                 }
                 $act_req->request_code = $code;
+                $act_req->requester_id = $job_req->requester_id;
                 $act_req->job_request_id = $id;
                 $act_req->status = "accepted";
                 $act_req->save();
-    
-                $job_req = Job_request::where('request_code', $code)->first();
-        
     
                 $activityRequest = Activity_request::with(['job_req.requester.sectionRel', 'job_req.requester.divisionRel'])
                 ->where('id', $act_req->id)
@@ -162,9 +162,11 @@ class TechnicianController extends Controller
     public function done(Request $req){
         
         $user = $req->get('currentUser');
-        
+        $job_req = Job_request::where('request_code', $req->code)->first();
+
         $done_req = new Activity_request();
         $done_req->tech_from = $user->userid;
+        $done_req->requester_id = $job_req->requester_id;
         $done_req->request_code = $req->code;
         $done_req->job_request_id = $req->request_id;
         $done_req->status = "completed";

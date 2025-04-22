@@ -159,6 +159,8 @@ class AdminController extends Controller
 
         $requestId = $req->input('request_id');
 
+        $job_req = Job_request::where('request_code', $req->code)->first();
+
         $existingStatus = Activity_request::where('job_request_id', $requestId)
         ->orderByDesc('id')
         ->first();
@@ -170,6 +172,7 @@ class AdminController extends Controller
         $cancelled_admin  = new Activity_request();
 
         $cancelled_admin->job_request_id = $req->request_id;
+        $cancelled_admin->requester_id = $job_req->requester_id;
         $cancelled_admin->request_code = $req->code;
         $cancelled_admin->tech_from = $user->userid;
         $cancelled_admin->remarks = $req->input('cancelRemarks');
