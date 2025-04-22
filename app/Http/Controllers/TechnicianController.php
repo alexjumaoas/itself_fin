@@ -25,51 +25,23 @@ class TechnicianController extends Controller
 
     public function requestor(Request $req){
 
-        $user = $req->get('currentUser'); 
+        $user = $req->get('currentUser');
 
         $get_technician = Technician::where('status', 'active')
-        ->select('userid')
-        ->with('dtrUser:username,fname,lname')
-        ->where('userid', '!=', $user->userid)
-        ->get();
-        
-        // $job_pending = $this->jobRequestService->getJobRequestByStatus('pending');
-        // $job_pending = $this->jobRequestService->getJobRequestByStatus('transferred');
+            ->select('userid')
+            ->with('dtrUser:username,fname,lname')
+            ->where('userid', '!=', $user->userid)
+            ->get();
 
         $job_pending = collect($this->jobRequestService->getJobRequestByStatus('pending'))
             ->merge($this->jobRequestService->getJobRequestByStatus('transferred'));
 
         $job_accepted = $this->jobRequestService->getJobRequestByStatus('accepted');
         $job_transferred = $this->jobRequestService->getJobRequestByStatus('transferred');
-     
-        return view('pages.admin.request',  compact('job_pending','job_accepted','get_technician','job_transferred'));
+        $totalPending = $job_pending->count();
+
+        return view('pages.admin.request',  compact('job_pending','job_accepted','get_technician','job_transferred', 'totalPending'));
     }
-
-    // public function requestor(Request $req){
-    //     $user = $req->get('currentUser');  
-    //     // $job_requests = Job_request::where("status", "pending")->get();
-    //     $get_technician = Technician::where('status', 'active')
-    //         ->select('userid')
-    //         ->with('dtrUser:username,fname,lname')
-    //         ->where('userid', '!=', $user->userid)
-    //         ->get();
-      
-    //     $job_pending = self::jobRequestStatus('pending');
-    //     $job_accepted = self::jobRequestStatus('accepted');
-    //     $job_tranferred = self::jobRequestStatus('transferred');
-
-
-
-    //     return view('pages.admin.request',  compact('job_pending', 'job_accepted','get_technician','job_tranferred'));
-    //}
-
-    // private function jobRequestStatus($status){
-
-    //     return  Job_request::where("status", $status)
-    //     ->with(['requester.divisionRel', 'requester.sectionRel','technician','request_history','transferedRequests']) // Eager load relationships
-    //     ->orderby('id', 'desc')
-    //     ->get();
-    // }
 
     public function acceptRequest(Request $req, $id, $code)
     {
@@ -81,75 +53,72 @@ class TechnicianController extends Controller
             })
             ->orderBy('id', 'desc')
             ->first();
-           
-            $hasaccepted = ($latestaccepted && $latestaccepted->status != "transferred") ? 1 : 0;
-          
-            $user = $req->get('currentUser');
-            if($hasaccepted === 0 || $req->transfer == 'transferred'){
-             
-                $act_req = new Activity_request();
-                if($req->transfer == 'transferred'){
-                    $act_req->tech_to = $user->userid;
-                }else{
-                    $act_req->tech_from = $user->userid;
-                }
-                $act_req->request_code = $code;
-                $act_req->job_request_id = $id;
-                $act_req->status = "accepted";
-                $act_req->save();
-    
-                $job_req = Job_request::where('request_code', $code)->first();
-        
-    
-                $activityRequest = Activity_request::with(['job_req.requester.sectionRel', 'job_req.requester.divisionRel'])
-                ->where('id', $act_req->id)
-                ->first();
-    
-                $firebaseData = [
-                    'request_code' => $code,
-                    'tech_name' => $user->fname . ' ' . $user->lname,
-                    'tech_id' => $user->userid,
-                    'description' => $job_req->description,
-                    'requester_name' => $activityRequest->job_req->requester->fname . ' ' . $activityRequest->job_req->requester->lname,
-                    'section' => $activityRequest->job_req->requester->sectionRel->acronym,
-                    'division' => $activityRequest->job_req->requester->divisionRel->description,
-                    'timestamp' => Carbon::now()->toIso8601String(),
-                    'status' => 'accepted'
-                ];
-    
-                session()->flash('success', 'Successfully accepted request!');
-                session()->flash('firebaseData', $firebaseData);
 
-                if ($req->ajax() || $req->wantsJson()) {
-                    return response()->json([
-                        'success' => true,
-                        'fullname' => $activityRequest->job_req->requester->fname . ' ' . $activityRequest->job_req->requester->lname,
-                        'message' => 'Successfully accepted request!',
-                        'isAccepted' =>  $hasaccepted, 
-                        'issample' => $latestaccepted,
-                        'isampleCode' => $code,
-                        'firebaseData' => $firebaseData,
-                    ]);
-                }
+        $hasaccepted = ($latestaccepted && $latestaccepted->status != "transferred") ? 1 : 0;
 
-            }else {
-                if ($req->ajax() || $req->wantsJson()) {
-                    return response()->json([
-                        'success' => true,
-                        'isAccepted' =>  $hasaccepted,
-                        'issample' => $latestaccepted,
-                        'isampleCode' => $code,
-                    ]);
-                }else{
-                    return redirect()->route('technician.request')->with('success', 'Successfully accepted request!');
+        $user = $req->get('currentUser');
+        if($hasaccepted === 0 || $req->transfer == 'transferred'){
 
-                }
-            }   
+            $act_req = new Activity_request();
+            if($req->transfer == 'transferred'){
+                $act_req->tech_to = $user->userid;
+            }else{
+                $act_req->tech_from = $user->userid;
+            }
+            $act_req->request_code = $code;
+            $act_req->job_request_id = $id;
+            $act_req->status = "accepted";
+            $act_req->save();
+
+            $job_req = Job_request::where('request_code', $code)->first();
 
 
-            return redirect()->route('technician.request');
+            $activityRequest = Activity_request::with(['job_req.requester.sectionRel', 'job_req.requester.divisionRel'])
+            ->where('id', $act_req->id)
+            ->first();
 
-       
+            $firebaseData = [
+                'request_code' => $code,
+                'tech_name' => $user->fname . ' ' . $user->lname,
+                'tech_id' => $user->userid,
+                'description' => $job_req->description,
+                'requester_name' => $activityRequest->job_req->requester->fname . ' ' . $activityRequest->job_req->requester->lname,
+                'section' => $activityRequest->job_req->requester->sectionRel->acronym,
+                'division' => $activityRequest->job_req->requester->divisionRel->description,
+                'timestamp' => Carbon::now()->toIso8601String(),
+                'status' => 'accepted'
+            ];
+
+            session()->flash('success', 'Successfully accepted request!');
+            session()->flash('firebaseData', $firebaseData);
+
+            if ($req->ajax() || $req->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'fullname' => $activityRequest->job_req->requester->fname . ' ' . $activityRequest->job_req->requester->lname,
+                    'message' => 'Successfully accepted request!',
+                    'isAccepted' =>  $hasaccepted,
+                    'issample' => $latestaccepted,
+                    'isampleCode' => $code,
+                    'firebaseData' => $firebaseData,
+                ]);
+            }
+
+        }else {
+            if ($req->ajax() || $req->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'isAccepted' =>  $hasaccepted,
+                    'issample' => $latestaccepted,
+                    'isampleCode' => $code,
+                ]);
+            }else{
+                return redirect()->route('technician.request')->with('success', 'Successfully accepted request!');
+
+            }
+        }
+
+        return redirect()->route('technician.request');
     }
 
     public function finished(){
@@ -160,9 +129,9 @@ class TechnicianController extends Controller
     }
 
     public function done(Request $req){
-        
+
         $user = $req->get('currentUser');
-        
+
         $done_req = new Activity_request();
         $done_req->tech_from = $user->userid;
         $done_req->request_code = $req->code;
@@ -194,7 +163,7 @@ class TechnicianController extends Controller
         $tranferred->remarks = $req->transferReason;
         $tranferred->status = "transferred";
         $tranferred->save();
-        
+
         $job_req = Job_request::where('request_code', $req->code)->first();
         $activity = Activity_request::with(['job_req.requester.sectionRel', 'job_req.requester.divisionRel'])
                 ->where('id', $tranferred->id)
@@ -216,7 +185,7 @@ class TechnicianController extends Controller
             'timestamp' => Carbon::now()->toIso8601String(),
             'status' => 'transferred'
         ];
-    
+
         // session()->flash('success', 'Successfully accepted request!');
         // session()->flash('transferredData', $transferredData);
 
@@ -233,12 +202,12 @@ class TechnicianController extends Controller
                         ->orderBy('created_at', 'desc')
                         ->first();
 
-        return response()->json([ 
+        return response()->json([
             'success' =>  $tatestaccepted
         ]);
 
     }
-    
+
     public function generateRepairSteps(Request $request, OpenAIService $openAIService)
     {
         $request->validate([
@@ -247,15 +216,15 @@ class TechnicianController extends Controller
         ]);
 
         try {
-            $prompt = "As an experienced IT technician, provide step-by-step troubleshooting guide for: " . 
-                    $request->input('request_type') . 
+            $prompt = "As an experienced IT technician, provide step-by-step troubleshooting guide for: " .
+                    $request->input('request_type') .
                     // "\n\nFormat as HTML with checkboxes for each step. " .
                     "\n\nFormat as HTML for each step. " .
                     "Include common solutions or any requirements if needed" .
                     "Keep it professional but easy to understand.";
 
             $response = $openAIService->generateResponse($prompt);
-            
+
             return response()->json([
                 'success' => true,
                 'steps' => $response
@@ -267,5 +236,5 @@ class TechnicianController extends Controller
             ], 500);
         }
     }
-    
-}   
+
+}

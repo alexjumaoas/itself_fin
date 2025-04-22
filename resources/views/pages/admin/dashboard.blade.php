@@ -42,7 +42,6 @@
         @else
             <h6 class="op-7 mb-2">Technician Dashboard</h6>
         @endif
-
     </div>
     <!-- <div class="ms-md-auto py-2 py-md-0">
         <a href="#" class="btn btn-label-info btn-round me-2">Manage</a>
@@ -80,7 +79,7 @@
                 <div class="row align-items-center">
                     <div class="col-icon">
                         <div
-                            class="icon-big text-center icon-secondary bubble-shadow-small"
+                            class="icon-big text-center icon-danger bubble-shadow-small"
                         >
                         <i class="fas fa-spinner fa-spin"></i>
                         </div>
@@ -88,7 +87,7 @@
                     <div class="col col-stats ms-3 ms-sm-0">
                         <div class="numbers">
                             <p class="card-category">Pending</p>
-                            <h4 class="card-title">{{$totalpending}}</h4>
+                            <h4 class="card-title">{{$totalPending}}</h4>
                         </div>
                     </div>
                 </div>
@@ -102,14 +101,14 @@
                 <div class="row align-items-center">
                     <div class="col-icon">
                         <div
-                            class="icon-big text-center icon-danger bubble-shadow-small"
+                            class="icon-big text-center icon-secondary bubble-shadow-small"
                         >
                         <i class="fas fa-arrow-down arrow-down"></i>
                         </div>
                     </div>
                     <div class="col col-stats ms-3 ms-sm-0">
                         <div class="numbers">
-                            <p class="card-category">Accepted</p>
+                            <p class="card-category">Accepted / Ongoing</p>
                             <h4 class="card-title">{{$acceptedCount}}</h4>
                         </div>
                     </div>
@@ -117,72 +116,28 @@
             </div>
         </div>
     </a>
-
-    {{-- <a class="col-sm-6 col-md-2 dash" href="">
+    @php
+        $route = $userInfo->usertype == 1 ? 'finished' : 'technician.finished';
+    @endphp
+    <a class="col-sm-6 col-md-3 dash" href="{{ route($route) }}">
         <div class="card card-stats card-round">
             <div class="card-body">
                 <div class="row align-items-center">
                     <div class="col-icon">
-                        <div
-                            class="icon-big text-center icon-danger bubble-shadow-small"
-                        >
-                        <i class="fas fa-arrow-down arrow-down"></i>
+                        <div class="icon-big text-center icon-success bubble-shadow-small">
+                            <i class="far fa-check-circle"></i>
                         </div>
                     </div>
                     <div class="col col-stats ms-3 ms-sm-0">
                         <div class="numbers">
-                            <p class="card-category">Transfer</p>
-                            <h4 class="card-title">0</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </a> --}}
-
-    <a class="col-sm-6 col-md-3 dash" href="{{ route('finished') }}">
-        <div class="card card-stats card-round">
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-icon">
-                        <div
-                            class="icon-big text-center icon-success bubble-shadow-small"
-                        >
-                        <i class="far fa-check-circle"></i>
-                        </div>
-                    </div>
-                    <div class="col col-stats ms-3 ms-sm-0">
-                        <div class="numbers">
-                            <p class="card-category">Finished</p>
-                            <h4 class="card-title">{{$completedCount}}</h4>
+                            <p class="card-category">Completed</p>
+                            <h4 class="card-title">{{ $completedCount }}</h4>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </a>
-
-    {{-- <a class="col-sm-6 col-md-3 dash">
-        <div class="card card-stats card-round">
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-icon">
-                        <div
-                            class="icon-big text-center icon-warning bubble-shadow-small"
-                        >
-                        <i class="fas fa-undo-alt"></i>
-                        </div>
-                    </div>
-                    <div class="col col-stats ms-3 ms-sm-0">
-                        <div class="numbers">
-                            <p class="card-category">Cancelled</p>
-                            <h4 class="card-title">{{$cancelledCount}}</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </a> --}}
 </div>
 
 <div class="row">
@@ -212,7 +167,7 @@
         </div>
     </div>
 
-    <div class="col-md-4">
+    {{-- <div class="col-md-4">
         <div class="card">
             <div class="card-header">
                 <div class="card-title">Request Status Distribution</div>
@@ -223,14 +178,94 @@
                 </div>
             </div>
         </div>
+    </div> --}}
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Request Status Distribution</div>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="doughnutChart" style="width: 740px; height: 300px; display: block;" width="740" height="300" class="chartjs-render-monitor"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+
+<!-- Data Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Recent Activity Requests</div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date Requested</th>
+                                <th>Request Code</th>
+                                <th>Requester</th>
+                                <th>Department</th>
+                                <th>Technician</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($recentAcceptedCompleted as $activity)
+                                <tr>
+                                    <td>{{ \Carbon\Carbon::parse($activity->created_at)->format('M d, Y h:i:s A') }}</td>
+                                    <td>{{ $activity->request_code }}</td>
+                                    <td>
+                                        {{
+                                            trim(
+                                                ($activity->job_req->requester->fname ?? '') . ' ' .
+                                                ($activity->job_req->requester->mname ?? '') . ' ' .
+                                                ($activity->job_req->requester->lname ?? '')
+                                            ) ?: 'N/A'
+                                        }}
+                                    </td>
+                                    <td>{{ $activity->job_req->requester->sectionRel->description ?? 'N/A' }}</td>
+                                    <td>
+                                        {{
+                                            trim(
+                                                ($activity->techFromUser->fname ?? '') . ' ' .
+                                                ($activity->techFromUser->mname ?? '') . ' ' .
+                                                ($activity->techFromUser->lname ?? '')
+                                            ) ?: 'N/A'
+                                        }}
+                                    </td>
+                                    <td>
+                                        @php
+                                            $isCompleted = $activity->status === 'completed';
+                                            $badgeClass = $isCompleted ? 'bg-success' : 'bg-secondary';
+                                            $label = $isCompleted ? 'Completed' : 'Ongoing'; // change 'accepted' to 'Ongoing'
+                                        @endphp
+                                        <span class="badge {{ $badgeClass }}">{{ $label }}</span>
+                                    </td>
+                                    <td>{{ \Carbon\Carbon::parse($activity->updated_at)->format('M d, Y h:i:s A') }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script src="{{ asset('/assets/js/plugin/chart.js/chart.min.js') }}"></script>
 <script>
     var lineChart = document.getElementById("lineChart").getContext("2d"),
         barChart = document.getElementById("barChart").getContext("2d"),
-        pieChart = document.getElementById("pieChart").getContext("2d");
+        // pieChart = document.getElementById("pieChart").getContext("2d"),
+        doughnutChart = document.getElementById("doughnutChart").getContext("2d");
 
     var myLineChart = new Chart(lineChart, {
         type: "line",
@@ -305,47 +340,77 @@
         },
     });
 
-    var myPieChart = new Chart(pieChart, {
-        type: "pie",
+    // var myPieChart = new Chart(pieChart, {
+    //     type: "pie",
+    //     data: {
+    //     datasets: [{
+    //         data: [50, 35, 15, 5],
+    //         backgroundColor: ["#1d7af3", "#f3545d", "#fdaf4b", "#fdaf4b"],
+    //         borderWidth: 0,
+    //     }],
+    //     labels: ["Completed", "Pending", "Ongoing", "Cancel"],
+    //     },
+    //     options: {
+    //     responsive: true,
+    //     maintainAspectRatio: false,
+    //     legend: {
+    //         position: "bottom",
+    //         labels: {
+    //         fontColor: "rgb(154, 154, 154)",
+    //         fontSize: 11,
+    //         usePointStyle: true,
+    //         padding: 20,
+    //         },
+    //     },
+    //     pieceLabel: {
+    //         render: "percentage",
+    //         fontColor: "white",
+    //         fontSize: 14,
+    //     },
+    //     tooltips: false,
+    //     layout: {
+    //         padding: {
+    //         left: 20,
+    //         right: 20,
+    //         top: 20,
+    //         bottom: 20,
+    //         },
+    //     },
+    //     },
+    // });
+
+    const pending = @json($pendingCount);
+    const accepted = @json($acceptedCount);
+    const completed = @json($completedCount);
+    const cancelled = @json($cancelledCount);
+
+    var myDoughnutChart = new Chart(doughnutChart, {
+        type: "doughnut",
         data: {
-        datasets: [{
-            data: [50, 35, 15],
-            backgroundColor: ["#1d7af3", "#f3545d", "#fdaf4b"],
-            borderWidth: 0,
-        }],
-        labels: ["New Visitors", "Subscribers", "Active Users"],
+            datasets: [
+                {
+                    data: [pending, accepted, completed, cancelled],
+                    backgroundColor: ["#f3545d", "#6861CE", "#31CE36", "#FDAF4B"],
+                },
+            ],
+            labels: ["Pending", "Ongoing", "Completed", "Cancelled"],
         },
         options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        legend: {
-            position: "bottom",
-            labels: {
-            fontColor: "rgb(154, 154, 154)",
-            fontSize: 11,
-            usePointStyle: true,
-            padding: 20,
+            responsive: true,
+            maintainAspectRatio: false,
+            legend: {
+                position: "right",
             },
-        },
-        pieceLabel: {
-            render: "percentage",
-            fontColor: "white",
-            fontSize: 14,
-        },
-        tooltips: false,
-        layout: {
-            padding: {
-            left: 20,
-            right: 20,
-            top: 20,
-            bottom: 20,
+            layout: {
+                padding: {
+                    left: 20,
+                    right: 20,
+                    top: 20,
+                    bottom: 20,
+                },
             },
-        },
         },
     });
+
 </script>
-
-
-
-
 @endsection

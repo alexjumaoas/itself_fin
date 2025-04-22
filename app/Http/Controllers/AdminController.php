@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Redirect;
 
 class AdminController extends Controller
 {
-    //
     protected $jobRequestService;
 
     public function __construct(JobRequestService $jobRequestService)
@@ -25,50 +24,54 @@ class AdminController extends Controller
         $this->jobRequestService = $jobRequestService;
     }
 
-    public function index(Request $req)
+    public function index(Request $request)
     {
-        $user = $req->get('currentUser');
+        $user = $request->get('currentUser');
 
         $pendingCount = 0;
         $acceptedCount = 0;
         $completedCount = 0;
         $cancelledCount = 0;
         $traferredCount = 0;
-        $totalpending = 0;
+        $totalPending = 0;
         $totalRequest = 0;
-        if($user->usertype == 1){
+
+        if($user->usertype == 1 || $user->usertype == 2){
             $pendingCount = $this->jobRequestService->getJobRequestByStatus('pending')->count();
             $acceptedCount = $this->jobRequestService->getJobRequestByStatus('accepted')->count();
             $completedCount = $this->jobRequestService->getJobRequestByStatus('completed')->count();
             $cancelledCount = $this->jobRequestService->getJobRequestByStatus('cancelled')->count();
             $traferredCount = $this->jobRequestService->getJobRequestByStatus('transferred')->count();
-            $totalpending = $pendingCount + $traferredCount;
-            $totalRequest = $totalpending  + $acceptedCount + $cancelledCount + $completedCount;
-        }else if($user->usertype == 2){
-            $pendingCount = $this->jobRequestService->getJobRequestByStatus('pending', $user->username)->count();
-            $acceptedCount = $this->jobRequestService->getJobRequestByStatus('accepted', $user->username)->count();
-            $completedCount = $this->jobRequestService->getJobRequestByStatus('completed', $user->username)->count();
-            $cancelledCount = $this->jobRequestService->getJobRequestByStatus('cancelled', $user->username)->count();
-            $traferredCount = $this->jobRequestService->getJobRequestByStatus('transferred',$user->username)->count();
-            $totalpending = $pendingCount + $traferredCount;
-            $totalRequest = $totalpending  + $acceptedCount + $cancelledCount + $completedCount;
-        }
 
-        //---------------------------------------------------------
+        }
+        $totalPending = $pendingCount + $traferredCount;
+        $totalRequest = $totalPending  + $acceptedCount + $cancelledCount + $completedCount;
+
         $monthlyCompleted = Activity_request::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
             ->where('status', 'completed')
             ->groupBy(DB::raw('MONTH(created_at)'))
             ->pluck('total', 'month')
             ->toArray();
-
-        // Make sure all months are present (0 if no data)
         $data = [];
         for ($i = 1; $i <= 12; $i++) {
             $data[] = $monthlyCompleted[$i] ?? 0;
         }
-        //---------------------------------------------------------
 
-        return view("pages.admin.dashboard", compact('totalpending', 'acceptedCount', 'completedCount','cancelledCount','traferredCount','totalRequest', 'data'));
+        //---------------------------------------------------------------------------------
+
+        $latestActivities = Activity_request::select(DB::raw('MAX(id) as id'))
+            ->groupBy('request_code');
+
+        $recentAcceptedCompleted = Activity_request::with(['job_req.requester', 'techFromUser'])
+            ->whereIn('id', $latestActivities)
+            ->whereIn('status', ['accepted', 'completed'])
+            ->orderByDesc('created_at')
+            // ->take(5) // limit to recent 5 if needed
+            ->get();
+
+        //---------------------------------------------------------------------------------
+
+        return view("pages.admin.dashboard", compact('totalPending', 'pendingCount', 'acceptedCount', 'completedCount','cancelledCount','traferredCount', 'totalRequest', 'data', 'recentAcceptedCompleted'));
     }
 
     public function getAllTechnican()
@@ -202,23 +205,4 @@ class AdminController extends Controller
 
         return response()->json(['status' => $existingStatus ? $existingStatus->status : 'unknown', 'canCancel' => true]);
     }
-
-    // public function showChart()
-    // {
-    //     $monthlyCompleted = Activity_request::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
-    //         ->where('status', 'completed')
-    //         ->groupBy(DB::raw('MONTH(created_at)'))
-    //         ->pluck('total', 'month')
-    //         ->toArray();
-
-    //     // Make sure all months are present (0 if no data)
-    //     $data = [];
-    //     for ($i = 1; $i <= 12; $i++) {
-    //         $data[] = $monthlyCompleted[$i] ?? 0;
-    //     }
-
-    //     return view('pages.admin.dashboard', compact('data'));
-    // }
-
-
 }

@@ -15,4 +15,3 @@ class Dts_section extends Model
         return $this->hasMany(Dts_user::class, 'section');
     }
 }
-    
