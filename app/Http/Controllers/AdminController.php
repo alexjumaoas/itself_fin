@@ -104,7 +104,7 @@ class AdminController extends Controller
         ->where('status', 'active')
         ->orderBy('id','desc')
         ->paginate(10);
-  
+            
         return view('pages.admin.display_tech', compact('technicians','dts_users'));
     }
 

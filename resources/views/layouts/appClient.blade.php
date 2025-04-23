@@ -103,7 +103,7 @@
                           />
                         </div>
                       </nav> -->
-                        @include('layouts.navbarClient', ['technicians' => $technicians ?? ''])
+                        @include('layouts.navbarClient')
                     </div>
                 </nav>
             </div>

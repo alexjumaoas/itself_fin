@@ -1,4 +1,4 @@
-@extends('layouts.appClient', ['technicians' => $technicians])
+@extends('layouts.appClient')
 @section('content')
 
 <div class="container">

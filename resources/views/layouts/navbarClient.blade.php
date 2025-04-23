@@ -9,6 +9,11 @@
 <?php
   use App\Models\Technician;
 
+  $technicians = Technician::with('dtrUser.dtsUser.designationRel')
+  ->where('status', 'active')
+  ->orderBy('id', 'desc')
+  ->get();
+
 ?>
 
 <ul class="nav nav-line nav-color-secondary" style="margin-left: 15%;">   <!-- style="margin-left: 25.3%;" -->

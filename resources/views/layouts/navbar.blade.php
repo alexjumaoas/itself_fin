@@ -7,7 +7,13 @@
 </style>
 
 <?php
+
   use App\Models\Technician;
+
+  $technicians = Technician::with('dtrUser.dtsUser.designationRel')
+  ->where('status', 'active')
+  ->orderBy('id', 'desc')
+  ->get();
 
 ?>
 
@@ -35,7 +41,8 @@
       </form>
     </ul>
   </li>
-   @if($userInfo->usertype == 1)
+
+  @if($userInfo->usertype == 1)
       <li class="nav-item topbar-icon dropdown hidden-caret">
         <a
             class="nav-link dropdown-toggle"
@@ -70,8 +77,9 @@
             <div class="message-notif-scroll scrollbar-outer">
                 <div class="notif-center">
                 @forelse (is_iterable($technicians) ? $technicians : [] as $tech)
-                  @if ($tech->is_online)
-                  
+               
+                  @if($tech->is_online)
+
                     <a href="#" class="activeTech">
                       <div class="notif-img">
                         <img
@@ -88,16 +96,14 @@
                     </a>
                   @endif
                 @empty
-                
+               <p>  no </p>
                 @endforelse
                 </div>
             </div>
           </li>
         </ul>
       </li>
-    @endif
-
-
+  @endif
   <!-- <li class="nav-item topbar-icon dropdown hidden-caret">
     <a
       class="nav-link dropdown-toggle"
