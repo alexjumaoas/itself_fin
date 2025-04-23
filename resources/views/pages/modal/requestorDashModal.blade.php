@@ -78,7 +78,7 @@
                                             <tr>
                                                 <td>{{ \Carbon\Carbon::parse($finish->job_req->request_date)->format('F d, Y h:i A') }}</td>
                                                 <td>{{$finish->job_req->description}}</td>
-                                                <td>{{$user ? $user->fname. ' ' . $user->mname. ' ' . $user->lname : 'N/A'}}</td>
+                                                <td>{{$user ? $user->fname. ' ' . $user->mname. ' ' . $user->lname : 'N/A'}} / {{$finish->diagnosis}}</td>
                                                 <td>{{ \Carbon\Carbon::parse($finish->created_at)->format('F d, Y h:i A') }}</td>
                                                 <td>Completed</td>
                                             </tr>

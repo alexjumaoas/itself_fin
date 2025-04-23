@@ -99,12 +99,12 @@ class AdminController extends Controller
         ->where('section', 80)
         ->orderBy('id','desc')
         ->get();
-
+        
         $technicians = Technician::with('dtrUser.dtsUser.designationRel')
         ->where('status', 'active')
         ->orderBy('id','desc')
         ->paginate(10);
-        // dd($technicians);
+  
         return view('pages.admin.display_tech', compact('technicians','dts_users'));
     }
 

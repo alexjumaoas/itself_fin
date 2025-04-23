@@ -76,6 +76,16 @@ class TechnicianController extends Controller
                 $activityRequest = Activity_request::with(['job_req.requester.sectionRel', 'job_req.requester.divisionRel'])
                 ->where('id', $act_req->id)
                 ->first();
+                if($hasaccepted === 0){
+                    Technician::where('userid', $user->userid)->update([
+                        'is_available' => 1,
+                    ]);
+                }else if($req->transfer == 'transferred'){
+                    Technician::where('userid', $user->userid)->update([
+                        'is_available' => 0,
+                    ]);
+                }
+               
 
                 $firebaseData = [
                     'request_code' => $code,
@@ -143,6 +153,10 @@ class TechnicianController extends Controller
         $done_req->diagnosis = $req->diagnosis;
         $done_req->resolution_notes = $req->resolution;
         $done_req->save();
+
+        Technician::where('userid', $user->userid)->update([
+            'is_available' => 0,
+        ]);
 
         // $done = Request_History::where('request_code', $req->code)->first();
         // $done->action = $req->action;

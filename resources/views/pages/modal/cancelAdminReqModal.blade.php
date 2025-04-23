@@ -162,7 +162,7 @@
                     divPending.remove();
                     $('#cancelModal').modal('hide');
                     
-                   // location.reload();
+                    location.reload();
                 }
             },
             error: function(xhr, status, error) {

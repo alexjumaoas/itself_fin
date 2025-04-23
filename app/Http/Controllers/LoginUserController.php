@@ -5,6 +5,7 @@ use App\Models\Dtruser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Technician;
 
 class LoginUserController extends Controller
 {
@@ -29,6 +30,15 @@ class LoginUserController extends Controller
             $req->session()->put('user_id', $user->id);
             $req->session()->put('usertype', $user->usertype);
             $req->session()->put('user', $user);
+
+            if($user->usertype == 2){
+               
+                $updated = Technician::where('userid', $user->username)->update([
+                    'is_online' => 1,
+                    'last_active_at' => now()
+                ]);
+            }
+
             switch ($user->usertype) {
                 case 0:
                     // redirect to requestor
@@ -49,6 +59,14 @@ class LoginUserController extends Controller
 
         $req->session()->forget(['user_id', 'usertype']);
 
+        $user = session('user');
+        
+        if ($user && $user->usertype == 2) {
+            Technician::where('userid', $user->username)->update([
+                'is_online' => 0,
+                'last_active_at' => now()
+            ]);
+        }
          // Invalidate the session
         $req->session()->invalidate();
 

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.app', ['technicians' => $technicians])
 @section('content')
 
 <div class="col-md-12">

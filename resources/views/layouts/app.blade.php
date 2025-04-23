@@ -131,7 +131,7 @@
                     </div>
                     <!-- End Logo Header -->
                 </div>
-
+            
                 <!-- Navbar Header -->
                 <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
                     <div class="container-fluid">
@@ -149,7 +149,7 @@
                                 />
                             </div>
                         </nav>
-                        @include('layouts.navbar')
+                        @include('layouts.navbar', ['technicians' => $technicians ?? ''])
                     </div>
                 </nav>
                 <!-- End Navbar -->
