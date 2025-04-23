@@ -27,12 +27,14 @@ class JobRequestController extends Controller
     public function index(Request $req)
     {
         $user = $req->get('currentUser');
-        $activity_reqs = $this->jobRequestService->getJobRequestByStatus('pending',null,$user->username);
-        $activity_finish = $this->jobRequestService->getJobRequestByStatus('completed',null,$user->username);
-        $activity_acept = $this->jobRequestService->getJobRequestByStatus('accepted',null,$user->username)
-            ->merge($this->jobRequestService->getJobRequestByStatus('transferred',null,$user->username));
+
+        $activity_reqs = $this->jobRequestService->getJobRequestByStatus('pending', null, $user->username);
+       
+        $activity_finish = $this->jobRequestService->getJobRequestByStatus('completed', null, $user->username);
+        $activity_acept = $this->jobRequestService->getJobRequestByStatus('accepted', null, $user->username)
+            ->merge($this->jobRequestService->getJobRequestByStatus('transferred', null, $user->username));
      
-        return view('pages.requestor.newRequest', compact('activity_reqs','activity_acept'));
+        return view('pages.requestor.newRequest', compact('activity_reqs','activity_acept','user'));
     }
     
     public function saverequest(Request $req){
@@ -62,7 +64,7 @@ class JobRequestController extends Controller
 
         $request_it->request_code = now()->format('YmdHis') . '-' . rand(1000, 9999);
         $request_it->description = $descriptionString;
-        $request_it->requester_id = $user->userid;
+        $request_it->requester_id =  $user->userid;
         $request_it->request_date = Carbon::now();
         $request_it->save();
 
@@ -76,7 +78,7 @@ class JobRequestController extends Controller
         $activityRequest = Activity_request::with(['job_req.requester.sectionRel', 'job_req.requester.divisionRel'])
         ->where('id', $activity->id)
         ->first();
-
+        
         return redirect()->route('currentRequest')
         ->with('success', 'Successfully created request!')
         ->with('PendingData', [
