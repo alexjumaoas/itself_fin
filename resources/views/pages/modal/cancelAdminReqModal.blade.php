@@ -108,73 +108,79 @@
         const divId = `pending${requestCode}`;
         const divPending = document.getElementById(divId);
         
-        $.ajax({
-            url: "{{ route('admin.check.status') }}",
-            type: 'GET',
-            data: {
-                request_id: requestId
-            },
-            success: function(response){
-                if (response.canCancel || response.otherCancel) {
-                     
-                    $.ajax({
-                        url: "{{ route('admin.cancel') }}",
-                        type: 'POST',
-                        data: {
-                            _token: $('input[name="_token"]').val(),
-                            request_id: requestId,
-                            code: requestCode,
-                            cancelRemarks: cancelRemarks
-                        },
-                        success: function(response){
-                           
-                            divPending.remove();
-                        
-                            swal({
-                                icon: 'success',
-                                title: 'Success',
-                                text: 'Request cancelled successfully',
-                            }).then(() => {
-                                divPending.remove();
-                                // Close modal and refresh page if needed
-                                $('#cancelModal').modal('hide');
-                                // location.reload();
-                            });
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Cancellation failed:', error);
+        swal({
+            title: "Are you sure?",
+            text: "Do you really want to cancel this request?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willCancel) => { 
+            if(willCancel){
+
+                $.ajax({
+                    url: "{{ route('admin.check.status') }}",
+                    type: 'GET',
+                    data: {
+                        request_id: requestId
+                    },
+                    success: function(response){
+                        if (response.canCancel || response.otherCancel) {
+                            
+                            $.ajax({
+                                url: "{{ route('admin.cancel') }}",
+                                type: 'POST',
+                                data: {
+                                    _token: $('input[name="_token"]').val(),
+                                    request_id: requestId,
+                                    code: requestCode,
+                                    cancelRemarks: cancelRemarks
+                                },
+                                success: function(response){
+                                    console.log("larepie", response);
+                                    swal({
+                                        icon: 'success',
+                                        title: 'Success',
+                                        text: 'Request cancelled successfully',
+                                    }).then(() => {
+                                        // Close modal and refresh page if needed
+                                        $('#cancelModal').modal('hide');
+                                        location.reload();
+                                    });
+                                },
+                                error: function(xhr, status, error) {
+                                    console.error('Cancellation failed:', error);
+                                    swal({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'Unable to cancel request. Please try again later.',
+                                    });
+                                }
+                            })
+
+                        }else{
+
                             swal({
                                 icon: 'error',
-                                title: 'Error',
-                                text: 'Unable to cancel request. Please try again later.',
+                                title: 'Cannot Cancel',
+                                text: 'This request has already been cancelled or accepted and cannot be cancelled.',
                             });
+                            $('#cancelModal').modal('hide');
+                            location.reload();
                         }
-                    })
-
-                }else{
-
-                    swal({
-                        icon: 'error',
-                        title: 'Cannot Cancel',
-                        text: 'This request has already been cancelled or accepted and cannot be cancelled.',
-                    });
-                    
-                    divPending.remove();
-                    $('#cancelModal').modal('hide');
-                    
-                    location.reload();
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Status check failed:', error);
-                swal({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Unable to verify request status. Please try again later.',
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Status check failed:', error);
+                        swal({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Unable to verify request status. Please try again later.',
+                        });
+                    }
                 });
+
             }
         });
-
+       
     });
 
 </script>
