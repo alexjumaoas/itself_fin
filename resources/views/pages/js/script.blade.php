@@ -10,7 +10,7 @@
         appId: "1:865081651173:web:124dff13445781cf4f890c",
         measurementId: "G-JVFWD126DM"
     };
-    
+
     firebase.initializeApp(firebaseConfig);
 </script>
 
@@ -54,7 +54,7 @@
     let database = firebase.database();
 
     const requestsRef = database.ref('acceptedRequests');
-  
+
     // Listen for new accepted requests
     requestsRef.on('child_added', (snapshot) => {
         const requestData = snapshot.val();
@@ -71,9 +71,9 @@
     requestsRef.on('child_changed', (snapshot) => {
         const updatedData = snapshot.val();
         console.log("Updated Request:", updatedData);
-        
+
         updateAcceptedRequestsUI(updatedData, requestKey);
-    
+
     });
 
     function updateAcceptedRequestsUI(data, requestKey) {
@@ -119,10 +119,10 @@
         requestsRow.appendChild(cardWrapper);
 
         let ul = cardWrapper.querySelector("#request-list");
-        
+
         if(data.description){
             const description = data.description.split(',').map(item => item.trim());
-            
+
             description.forEach((task, index) => {
                 let li = document.createElement("li");
 
@@ -143,7 +143,7 @@
     }
 
     function deleteaccepted(accepted_key){
-        
+
         requestsRef.child(accepted_key).remove()
         .then(() =>{
             console.log("Request successfully deleted");
@@ -156,7 +156,7 @@
     //pending Request
 
     const pendingRequestsRef = database.ref('pendingRequests');
-        
+
     pendingRequestsRef.on('child_added', (snapshot) => {
         pendingRequestsArray = [];
         const requestData = snapshot.val();
@@ -177,14 +177,14 @@
     pendingRequestsRef.on('child_changed', (snapshot) => {
         const updatedData = snapshot.val();
         const requestKey = snapshot.key;
-        
+
         // Update the specific request in UI
         updatePendingRequestsUI(updatedData,requestKey);
-    
+
     });
 
     function updatePendingRequestsUI(pendingData,requestKey){
-        
+
         $.ajax({
             url:"{{ route('requestor.isaccepted') }}",
             type:'GET',
@@ -221,7 +221,7 @@
             pendingRequestsArray.forEach((pendingData, index) => {
                 const isDisabled = index !== 0
             buttonAccepted = `
-                <button class="btn btn-danger w-100 bubble-shadow" 
+                <button class="btn btn-danger w-100 bubble-shadow"
                     onclick="handleAccept('${modifiedKey}','${pendingData.job_request_id}', '${pendingData.request_code}','${pendingData.requester_name}','${pendingData.status}')"
                      ${isDisabled ? 'disabled' : ''}
                     >
@@ -254,7 +254,7 @@
                     <div>
                         <p style="line-height: .5; font-weight: 600; display: inline-block; margin-right: 10px;">Request(s):</p>
                         <ul>${taskItems}</ul>
-                    </div> 
+                    </div>
                 </div>
                  ${buttonAccepted}
             </div>
@@ -280,7 +280,7 @@
 
 //Transfer realtime
 const TransferRequestsRef = database.ref('TransferData');
-        
+
 TransferRequestsRef.on('child_added', (snapshot) => {
         const requestData = snapshot.val();
         const requestKey = snapshot.key;
@@ -300,10 +300,10 @@ TransferRequestsRef.on('child_added', (snapshot) => {
         const requestKey = snapshot.key;
 
         document.querySelector(`#transfer${requestKey}`)?.remove();
-       
+
         // Update the specific request in UI
         updateTransferRequestsUI(updatedData,requestKey);
-    
+
     });
 
     function updateTransferRequestsUI(transferData,requestKey){
@@ -315,7 +315,7 @@ TransferRequestsRef.on('child_added', (snapshot) => {
             }else{
                 container = document.querySelector("#pending-requests-container");
             }
-        
+
             let buttonTransfer = '';
 
             const modifiedKey = requestKey.replace(/^[-]+/, '');
@@ -329,7 +329,7 @@ TransferRequestsRef.on('child_added', (snapshot) => {
                 `;
 
             }else{
-        
+
                 buttonTransfer = `
                     <button class="btn btn-warning w-100 bubble-shadow" onclick="handleAccept('${modifiedKey}','${transferData.job_request_id}', '${transferData.request_code}','${transferData.requester_name}','${transferData.status}')">
                         Accept
@@ -341,7 +341,7 @@ TransferRequestsRef.on('child_added', (snapshot) => {
             card.classList.add("col-md-3");
             // card.id = `pending${requestKey}`;
             // card.id = `pending${requestKey.replace(/^[-]+/, '')}`;
-           
+
             const taskItems = transferData.description.split(',').map(task => `<li><label>${task.trim()}</label></li>`).join('');
             card.innerHTML = `
                 <div class="card card-post card-round" style="border-top: 3px solid #f25961;">
@@ -369,7 +369,7 @@ TransferRequestsRef.on('child_added', (snapshot) => {
                         </div>
 
                     ${buttonTransfer}
-                       
+
                     </div>
                 </div>
             `;
@@ -382,13 +382,13 @@ TransferRequestsRef.on('child_added', (snapshot) => {
             console.error("job id and code is missing");
             return;
         }
-        
+
         fetch(`/technician/${job_id}/${code}/accept`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'X-Requested-With': 'XMLHttpRequest' 
+                'X-Requested-With': 'XMLHttpRequest'
             },
             body: JSON.stringify({
                 transfer: transferred
@@ -422,7 +422,7 @@ TransferRequestsRef.on('child_added', (snapshot) => {
                     return;
             }else{
                 if (data.success) {
-                    
+
                     swal({
                         title: "Success!",
                         text: `Request from ${data.fullname} is accepted`,
@@ -446,7 +446,7 @@ TransferRequestsRef.on('child_added', (snapshot) => {
                     return;
                 }
             }
-         
+
         })
         .catch(error => {
             console.error("Error:", error);
@@ -474,102 +474,102 @@ TransferRequestsRef.on('child_added', (snapshot) => {
 
     var agawn_request_code = "";
     $(document).ready(function() {
-    $('#aiRepairModal').on('show.bs.modal', function(event) {
-        const button = $(event.relatedTarget);
-        const requestType = button.data('request-type');
-        const requestCode = button.data('request-code');
-        agawn_request_code = requestCode;
-        const modal = $(this);
-        
-        // Generate repair steps based on request type
-        generateRepairSteps(requestType, requestCode, modal);
-    });
+        $('#aiRepairModal').on('show.bs.modal', function(event) {
+            const button = $(event.relatedTarget);
+            const requestType = button.data('request-type');
+            const requestCode = button.data('request-code');
+            agawn_request_code = requestCode;
+            const modal = $(this);
 
-    function generateRepairSteps(requestType, requestCode, modal) {
-        $.ajax({
-            url: '/generate-repair-steps',
-            method: 'POST',
-            data: {
-                request_type: requestType,
-                request_code: requestCode,
-                _token: '{{ csrf_token() }}'
-            },
-            success: function(response) {
-                if (response.success) {
-                    modal.find('#repairStepsContainer').html(response.steps);
-                    modal.find('#markAsFixed, #needMoreHelp').show();
-                    
-                    // Add event listener for checkboxes
-                    modal.find('.step-checkbox').change(function() {
-                        if (modal.find('.step-checkbox:checked').length === modal.find('.step-checkbox').length) {
-                            modal.find('#markAsFixed').removeClass('btn-success').addClass('btn-primary')
-                                .html('<i class="fas fa-check-double"></i> All Steps Completed - Submit Resolution');
-                        } else {
-                            modal.find('#markAsFixed').addClass('btn-success').removeClass('btn-primary')
-                                .html('<i class="fas fa-check"></i> Mark as Fixed');
-                        }
-                    });
-                } else {
-                    modal.find('#repairStepsContainer').html(
-                        `<div class="alert alert-danger">Error: ${response.message}</div>`
-                    );
-                }
-            },
-            error: function() {
-                modal.find('#repairStepsContainer').html(
-                    `<div class="alert alert-danger">Failed to generate repair steps. Please try again.</div>`
-                );
-            }
+            // Generate repair steps based on request type
+            generateRepairSteps(requestType, requestCode, modal);
         });
-    }
 
-    $('#markAsFixed').click(function() {
-        const modal = $(this).closest('.modal');
-        const requestCode = modal.find('#requestCode').val();
-        
-        // Submit resolution to server
-        submitResolution(requestCode, modal);
-    });
-
-    $('#needMoreHelp').click(function() {
-        const modal = $(this).closest('.modal');
-        modal.find('#repairStepsContainer').append(`
-            <div class="mt-3">
-                <div class="form-group">
-                    <label>Describe the issue you're facing:</label>
-                    <textarea class="form-control" id="additionalHelpText" rows="3"></textarea>
-                </div>
-                <button id="requestMoreHelp" class="btn btn-info mt-2">
-                    <i class="fas fa-paper-plane"></i> Request Advanced Help
-                </button>
-            </div>
-        `);
-        
-        $('#requestMoreHelp').click(function() {
-            const helpText = $('#additionalHelpText').val();
-            if (!helpText) {
-                alert('Please describe your issue');
-                return;
-            }
-            
+        function generateRepairSteps(requestType, requestCode, modal) {
             $.ajax({
-                url: '/request-advanced-help',
+                url: '/generate-repair-steps',
                 method: 'POST',
                 data: {
-                    request_code: agawn_request_code,
-                    help_text: helpText,
+                    request_type: requestType,
+                    request_code: requestCode,
                     _token: '{{ csrf_token() }}'
                 },
                 success: function(response) {
-                    modal.find('#repairStepsContainer').append(`
-                        <div class="alert alert-success mt-3">${response.message}</div>
-                    `);
+                    if (response.success) {
+                        modal.find('#repairStepsContainer').html(response.steps);
+                        modal.find('#markAsFixed, #needMoreHelp').show();
+
+                        // Add event listener for checkboxes
+                        modal.find('.step-checkbox').change(function() {
+                            if (modal.find('.step-checkbox:checked').length === modal.find('.step-checkbox').length) {
+                                modal.find('#markAsFixed').removeClass('btn-success').addClass('btn-primary')
+                                    .html('<i class="fas fa-check-double"></i> All Steps Completed - Submit Resolution');
+                            } else {
+                                modal.find('#markAsFixed').addClass('btn-success').removeClass('btn-primary')
+                                    .html('<i class="fas fa-check"></i> Mark as Fixed');
+                            }
+                        });
+                    } else {
+                        modal.find('#repairStepsContainer').html(
+                            `<div class="alert alert-danger">Error: ${response.message}</div>`
+                        );
+                    }
                 },
                 error: function() {
-                    alert('Failed to submit help request');
+                    modal.find('#repairStepsContainer').html(
+                        `<div class="alert alert-danger">Failed to generate repair steps. Please try again.</div>`
+                    );
                 }
+            });
+        }
+
+        $('#markAsFixed').click(function() {
+            const modal = $(this).closest('.modal');
+            const requestCode = modal.find('#requestCode').val();
+
+            // Submit resolution to server
+            submitResolution(requestCode, modal);
+        });
+
+        $('#needMoreHelp').click(function() {
+            const modal = $(this).closest('.modal');
+            modal.find('#repairStepsContainer').append(`
+                <div class="mt-3">
+                    <div class="form-group">
+                        <label>Describe the issue you're facing:</label>
+                        <textarea class="form-control" id="additionalHelpText" rows="3"></textarea>
+                    </div>
+                    <button id="requestMoreHelp" class="btn btn-info mt-2">
+                        <i class="fas fa-paper-plane"></i> Request Advanced Help
+                    </button>
+                </div>
+            `);
+
+            $('#requestMoreHelp').click(function() {
+                const helpText = $('#additionalHelpText').val();
+                if (!helpText) {
+                    alert('Please describe your issue');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/request-advanced-help',
+                    method: 'POST',
+                    data: {
+                        request_code: agawn_request_code,
+                        help_text: helpText,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        modal.find('#repairStepsContainer').append(`
+                            <div class="alert alert-success mt-3">${response.message}</div>
+                        `);
+                    },
+                    error: function() {
+                        alert('Failed to submit help request');
+                    }
+                });
             });
         });
     });
-});
 </script>
