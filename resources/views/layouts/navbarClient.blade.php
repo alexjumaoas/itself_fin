@@ -6,6 +6,11 @@
     }
 </style>
 
+<?php
+  use App\Models\Technician;
+
+?>
+
 <ul class="nav nav-line nav-color-secondary" style="margin-left: 15%;">   <!-- style="margin-left: 25.3%;" -->
     <li class="nav-item">
         <a class="nav-link {{ request()->routeIs('requestForm') ? 'active' : '' }}" href="{{ route('requestForm') }}">Home</a>
@@ -41,97 +46,64 @@
     </li>
 
     <li class="nav-item topbar-icon dropdown hidden-caret">
-        <a
-            class="nav-link dropdown-toggle"
-            href="#"
-            id="messageDropdown"
-            role="button"
-            data-bs-toggle="dropdown"
-            aria-haspopup="true"
-            aria-expanded="false">
-            <i class="fas fa-users-cog"></i>
-            <span class="notification">4</span>
-        </a>
-        <ul
-        class="dropdown-menu messages-notif-box animated fadeIn"
-        aria-labelledby="messageDropdown">
-        <li>
-            <div class="dropdown-title d-flex justify-content-center align-items-center" style="background-color: #1572e8;">
-                <a href="#" class="small" style="color: white;">
-                    <i class="fas fa-circle" style="color: #31ce36; font-size: 10px; margin-right: 5px;"></i>
-                    Active Technicians
-                </a>
-            </div>
-        </li>
-        <li>
-            <div class="message-notif-scroll scrollbar-outer">
-                <div class="notif-center">
-                <a href="#" class="activeTech">
-                    <div class="notif-img">
-                    <img
-                        src="{{ asset('assets/img/jm_denis.jpg') }}"
-                        alt="Img Profile"
-                    />
-                    </div>
-                    <div class="notif-content techName">
-                    <span class="subject"><i class="fas fa-circle" style="color: #31ce36; font-size: 8px; margin-right: 5px;"></i>Jimmy Denis Padil</span>
-                    <span class="block">Ongoing Request in MSD</span>
-                    <span class="time">5 minutes ago</span>
-                    </div>
-                </a>
-
-                <a href="#" class="activeTech">
-                    <div class="notif-img">
-                    <img
-                        src="{{ asset('assets/img/chadengle.jpg') }}"
-                        alt="Img Profile"
-                    />
-                    </div>
-                    <div class="notif-content techName">
-                    <span class="subject"><i class="fas fa-circle" style="color: #31ce36; font-size: 8px; margin-right: 5px;"></i>Chad Borja</span>
-                    <span class="block">Ongoing Request in RD/ARD</span>
-                    <span class="time">12 minutes ago</span>
-                    </div>
-                </a>
-
-                <a href="#" class="activeTech">
-                    <div class="notif-img">
-                    <img
-                        src="{{ asset('assets/img/mlane.jpg') }}"
-                        alt="Img Profile"
-                    />
-                    </div>
-                    <div class="notif-content techName">
-                    <span class="subject"><i class="fas fa-circle" style="color: #31ce36; font-size: 8px; margin-right: 5px;"></i>Jhon Doe Go</span>
-                    <!-- <span class="block">I'm in a meeting.</span>
-                    <span class="time">12 minutes ago</span> -->
-                    </div>
-                </a>
-
-                <a href="#" class="activeTech">
-                    <div class="notif-img">
-                    <img
-                        src="{{ asset('assets/img/talha.jpg') }}"
-                        alt="Img Profile"
-                    />
-                    </div>
-                    <div class="notif-content techName">
-                    <span class="subject"><i class="fas fa-circle" style="color: #31ce36; font-size: 8px; margin-right: 5px;"></i>Juan Dela Cruz</span>
-                    <!-- <span class="block">I'm on a pass slip.</span>
-                    <span class="time">17 minutes ago</span> -->
-                    </div>
-                </a>
-
-                </div>
-            </div>
-        </li>
-            <!-- <li>
-            <a class="see-all" href="javascript:void(0);"
-                >See all messages<i class="fa fa-angle-right"></i>
+    <a
+        class="nav-link dropdown-toggle"
+        href="#"
+        id="messageDropdown"
+        role="button"
+        data-bs-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false">
+        <i class="fas fa-users-cog"></i>
+      
+            <span class="notification">{{ Technician::where('is_online', true)->count() }}</span>
+        
+    </a>
+    <ul
+      class="dropdown-menu messages-notif-box animated fadeIn"
+      aria-labelledby="messageDropdown">
+      <li>
+        <div class="dropdown-title d-flex justify-content-center align-items-center" style="background-color: #1572e8;">
+            <a href="#" class="small" style="color: white;">
+                @if(Technician::where('is_online', true)->count())
+                  <i class="fas fa-circle" style="color: #31ce36; font-size: 10px; margin-right: 5px;"></i>
+                  Active Technicians
+                @else
+                  <i class="fas fa-circle" style="color: #ffad46; font-size: 10px; margin-right: 5px;"></i>
+                  No Active Technicians
+                @endif
             </a>
-            </li> -->
-        </ul>
-    </li>
+        </div>
+      </li>
+      <li>
+        <div class="message-notif-scroll scrollbar-outer">
+            <div class="notif-center">
+            @forelse (is_iterable($technicians) ? $technicians : [] as $tech)
+              @if ($tech->is_online)
+              
+                <a href="#" class="activeTech">
+                  <div class="notif-img">
+                    <img
+                      src="{{ asset('assets/img/jm_denis.jpg') }}"
+                      alt="Img Profile"
+                    />
+                  </div>
+                  
+                  <div class="notif-content techName">
+                    <span class="subject"><i class="fas fa-circle" style="color:{{ $tech->is_available ? '#31ce36' : '#ffad46' }}; font-size: 8px; margin-right: 5px;"></i>{{$tech->dtrUser->fname}} {{$tech->dtrUser->lname}}</span>
+                    <span class="block">{{ $tech->is_available ? 'Not Available' : 'Available' }}</span>
+                    <span class="time">{{ \Carbon\Carbon::parse($tech->last_active_at)->diffForHumans() ?? 'Just now' }}</span>
+                  </div>
+                </a>
+              @endif
+            @empty
+            
+            @endforelse
+            </div>
+        </div>
+      </li>
+    </ul>
+  </li>
 
     <!-- <li class="nav-item topbar-icon dropdown hidden-caret">
         <a

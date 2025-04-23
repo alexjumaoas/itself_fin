@@ -59,13 +59,7 @@
         height: 70px; 
     }
 
-    
-
-
-
-
   </style>
-
 
     <!-- <div class="wrapper"> -->
         <div class="main-panel">
@@ -109,7 +103,7 @@
                           />
                         </div>
                       </nav> -->
-                        @include('layouts.navbarClient')
+                        @include('layouts.navbarClient', ['technicians' => $technicians ?? ''])
                     </div>
                 </nav>
             </div>
