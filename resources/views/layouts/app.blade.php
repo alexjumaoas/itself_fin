@@ -149,7 +149,7 @@
                                 />
                             </div>
                         </nav>
-                        @include('layouts.navbar', ['technicians' => $technicians ?? ''])
+                        @include('layouts.navbar')
                     </div>
                 </nav>
                 <!-- End Navbar -->

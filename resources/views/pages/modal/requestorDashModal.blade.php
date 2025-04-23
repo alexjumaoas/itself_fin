@@ -142,4 +142,21 @@
 //       });
 //   });
 
+$(document).ready(function() {
+      let table = $('#dashTable').DataTable({
+          "paging": true,         // Enable pagination
+          "lengthMenu": [5, 10, 25, 50], // Rows per page
+          "searching": true,      // Enable search
+          "ordering": true,       // Enable sorting
+          "info": true,           // Show info (e.g., "Showing 1 to 10 of 50 entries")
+          "autoWidth": false,     // Prevent table width issues
+          "responsive": true      // Enable responsive design
+      });
+
+      //Fix DataTable re-rendering issue when modal opens
+      $('#dashModal').on('shown.bs.modal', function() {
+          table.columns.adjust().responsive.recalc();
+      });
+  });
+
 </script>
