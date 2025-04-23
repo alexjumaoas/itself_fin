@@ -36,7 +36,6 @@
     }
 </style>
 
-
 <!-- Modal -->
 <div class="modal modal-xl" id="dashModal" role="dialog" aria-labelledby="dashModalLabel" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog" role="document">
@@ -61,33 +60,52 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>April 03, 2025 11:58 AM</td>
-                                            <td>Install Software Application</td>
-                                            <td>Juan Dela Cruz</td>
-                                            <td>April 03, 2025 12:35 PM</td>
-                                            <td>Completed</td>
-                                        </tr>
+                                        @foreach($activity_finish as $finish)
+
+                                        @php
+
+                                        $user = App\Models\Dtruser::where(function ($query) use ($finish) {
+                                            if (!empty($finish->tech_from)) {
+                                                $query->where('username', $finish->tech_from);
+                                            }
+
+                                            if (!empty($finish->tech_to)) {
+                                                $query->orWhere('username', $finish->tech_to);
+                                            }
+                                        })->first();
+
+                                        @endphp
+                                            <tr>
+                                                <td>{{ \Carbon\Carbon::parse($finish->job_req->request_date)->format('F d, Y h:i A') }}</td>
+                                                <td>{{$finish->job_req->description}}</td>
+                                                <td>{{$user ? $user->fname. ' ' . $user->mname. ' ' . $user->lname : 'N/A'}}</td>
+                                                <td>{{ \Carbon\Carbon::parse($finish->created_at)->format('F d, Y h:i A') }}</td>
+                                                <td>Completed</td>
+                                            </tr>
+                                        @endforeach
+                                        @foreach($activity_cancelled as $cancelled)
+                                            <tr>
+                                                <td>{{ \Carbon\Carbon::parse($cancelled->job_req->request_date)->format('F d, Y h:i A') }}</td>
+                                                <td>{{$cancelled->job_req->description}}</td>
+                                                <td>{{ $cancelled->remarks}}</td>
+                                                <td>{{ \Carbon\Carbon::parse($cancelled->created_at)->format('F d, Y h:i A')}}</td>
+                                                <td style="color: red;">Cancelled</td>
+                                            </tr>
+                                        @endforeach
                                     </tbody>
                                 </table>
                             </div>
                         </div>
 
-                        <div class="row">
+                        <!-- <div class="row">
                             <div class="col-sm-12">
                                 <table id="dashTable" class="table table-hover">
                                     <tbody>
-                                        <tr>
-                                            <td>April 03, 2025 11:58 AM</td>
-                                            <td>Check Monitor</td>
-                                            <td>Na ok rag iyaha</td>
-                                            <td>April 03, 2025 12:35 PM</td>
-                                            <td style="color: red;">Cancelled</td>
-                                        </tr>
+                                       
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>

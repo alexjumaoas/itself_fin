@@ -22,7 +22,6 @@ class JobRequestController extends Controller
      {
          $this->jobRequestService = $jobRequestService;
      }
- 
 
     public function index(Request $req)
     {
@@ -35,6 +34,20 @@ class JobRequestController extends Controller
             ->merge($this->jobRequestService->getJobRequestByStatus('transferred', null, $user->username));
      
         return view('pages.requestor.newRequest', compact('activity_reqs','activity_acept','user'));
+    }
+
+    public function viewRequest(Request $req){
+        $user = $req->get('currentUser');
+
+        $activity_finish_count = $this->jobRequestService->getJobRequestByStatus('completed', null, $user->username)->count();
+        $activity_cancelled_count = $this->jobRequestService->getJobRequestByStatus('cancelled', null, $user->username)->count();
+
+        $activity_finish = $this->jobRequestService->getJobRequestByStatus('completed', null, $user->username);
+        $activity_cancelled = $this->jobRequestService->getJobRequestByStatus('cancelled', null, $user->username);
+
+        $totalRequest = $activity_finish_count + $activity_cancelled_count;
+        
+        return view('pages.requestor.requestForm', compact('totalRequest', 'activity_finish', 'activity_cancelled'));
     }
     
     public function saverequest(Request $req){
