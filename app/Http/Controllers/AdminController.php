@@ -127,7 +127,7 @@ class AdminController extends Controller
             ->orderBy('id','desc')
             ->paginate(10);
 
-        return view('pages.admin.display_tech', compact('technicians','dts_users', 'totalPending'));
+        return view('pages.admin.display_tech', compact('technicians', 'dts_users', 'totalPending'));
     }
 
     public function SavedTechnician(Request $req)

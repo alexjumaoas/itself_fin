@@ -6,6 +6,7 @@ use App\http\Controllers\JobRequestController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ExcelReportController;
+use App\Http\Controllers\ExcelAdminPerTechController;
 
 //for login user
 Route::get('/', function () {
@@ -57,7 +58,11 @@ Route::middleware(['check.user.type:1', 'load.user.data'])->group(function () {
 
 Route::get('/generate-excel', [ExcelReportController::class, 'generateExcel'])->name('generate.excel');
 Route::get('/generate-pdf/{request_code}', [PDFController::class, 'generatePDF'])->name('generate.pdf');
-
 Route::post('/generate-repair-steps', [TechnicianController::class, 'generateRepairSteps']);
+
+
+
+Route::get('/generate-excel/{username}', [ExcelAdminPerTechController::class, 'generateExcel'])->name('reportPerTechnician.excel');
+
 
 

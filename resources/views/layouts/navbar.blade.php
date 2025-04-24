@@ -53,9 +53,9 @@
             aria-haspopup="true"
             aria-expanded="false">
             <i class="fas fa-users-cog"></i>
-          
+
                 <span class="notification">{{ Technician::where('is_online', true)->count() }}</span>
-            
+
         </a>
         <ul
           class="dropdown-menu messages-notif-box animated fadeIn"
@@ -77,7 +77,7 @@
             <div class="message-notif-scroll scrollbar-outer">
                 <div class="notif-center">
                 @forelse (is_iterable($technicians) ? $technicians : [] as $tech)
-               
+
                   @if($tech->is_online)
 
                     <a href="#" class="activeTech">
@@ -87,7 +87,7 @@
                           alt="Img Profile"
                         />
                       </div>
-                      
+
                       <div class="notif-content techName">
                         <span class="subject"><i class="fas fa-circle" style="color:{{ $tech->is_available ? '#31ce36' : '#ffad46' }}; font-size: 8px; margin-right: 5px;"></i>{{$tech->dtrUser->fname}} {{$tech->dtrUser->lname}}</span>
                         <span class="block">{{ $tech->is_available ? 'Not Available' : 'Available' }}</span>

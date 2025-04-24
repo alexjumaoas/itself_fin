@@ -27,7 +27,7 @@ class Dts_user extends Model
          return $this->belongsTo(Dts_section::class, 'section');
      }
 
-     public function dtrUsers()
+    public function dtrUsers()
     {
         return $this->hasMany(Dtruser::class, 'userid', 'username');
     }

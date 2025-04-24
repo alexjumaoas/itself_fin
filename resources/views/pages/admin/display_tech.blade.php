@@ -40,12 +40,22 @@
                                             </td>
                                             <td>{{ $tech->dtrUser->fname ?? 'N/A' }}</td>
                                             <td>{{ $tech->dtrUser->lname ?? 'N/A' }}</td>
-                                            <td> </td>
-                                            <td><button type="button" class="btn btn-danger btn-xs" id="alert_demo_7" data-toggle="tooltip" data-placement="top" title="Remove as technician"><i class="fas fa-minus"></button></td>
+                                            <td>{{ $tech->dtrUser->dtsUser->designationRel->description ?? 'N/A' }} </td>
+                                            <td>
+                                                <a href="{{ route('reportPerTechnician.excel', $tech->dtrUser->username) }}"
+                                                    class="btn btn-primary btn-xs"
+                                                    data-toggle="tooltip"
+                                                    data-placement="top"
+                                                    title="Generate Excel Report">
+                                                    <i class="fas fa-file" style="font-size: 12px;"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-danger btn-xs" id="alert_demo_7" data-toggle="tooltip" data-placement="top" title="Remove as technician">
+                                                    <i class="fas fa-trash" style="font-size: 12px;"></i>
+                                                </button>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
-
                             </table>
                         </div>
                     </div>

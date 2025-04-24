@@ -19,9 +19,9 @@ class Technician extends Model
         return $this->belongsTo(Dtruser::class, 'userid', 'username');
     }
 
-    public function dtsUser()
-    {
-        return $this->hasOneThrough(Dts_user::class, Dtr_user::class, 'username', 'username', 'username', 'username');
-    }
+    // public function dtsUser()
+    // {
+    //     return $this->hasOneThrough(Dts_user::class, Dtr_user::class, 'username', 'username', 'username', 'username');
+    // }
 
 }

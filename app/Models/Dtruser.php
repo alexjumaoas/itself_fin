@@ -9,7 +9,7 @@ class Dtruser extends Model
     //
     protected $connection = 'dtr';
     protected $table = 'users';
-    
+
     public function technicians()
     {
         return $this->hasMany(Technician::class, 'userid', 'username');
@@ -19,5 +19,5 @@ class Dtruser extends Model
     {
         return $this->belongsTo(Dts_user::class, 'username', 'username');
     }
-    
+
 }
