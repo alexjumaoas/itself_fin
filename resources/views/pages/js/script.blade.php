@@ -217,7 +217,7 @@
             `;
 
         }else{
-            console.log("pendingRequestsArray", pendingRequestsArray)
+           
             pendingRequestsArray.forEach((pendingData, index) => {
                 const isDisabled = index !== 0
             buttonAccepted = `
@@ -225,7 +225,7 @@
                     onclick="handleAccept('${modifiedKey}','${pendingData.job_request_id}', '${pendingData.request_code}','${pendingData.requester_name}','${pendingData.status}')"
                      ${isDisabled ? 'disabled' : ''}
                     >
-                    Accept
+                    Accept 
                 </button>
             `;
             });

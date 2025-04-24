@@ -204,7 +204,16 @@ use App\Models\Dtruser;
         <h1 class="fw-bold">PENDING</h1>
     </div>
     @php
-        $firstEnabled = true; // Enable only the first pending job
+        $hasOngoing = false;
+
+        foreach($job_accepted as $accepted) {
+            if ($accepted->tech_from == $userInfo->userid || $accepted->tech_to == $userInfo->userid) {
+                $hasOngoing = true;
+                break;
+            }
+        }
+
+        $firstEnabled = true; // First accept button logic
     @endphp
     <!-- Real-time pending cards will appear here -->
     @forelse($job_pending as $pending)
@@ -273,17 +282,17 @@ use App\Models\Dtruser;
                             </form>
                     @else
                         <form id="acceptForm" style="margin-bottom: 0px;"
-                                action="{{ route('technician.accept', ['job' => $pending->job_req->id, 'code' => $pending->job_req->request_code]) }}"
-                                method="POST">
-                                @csrf
-                                <button class="btn btn-danger w-100 bubble-shadow" id="alert_demo_8"
-                                    @if(!$firstEnabled) disabled @endif>
-                                    Accept
-                                </button>
-                            </form>
-                            @php
-                                $firstEnabled = false; // Disable all other buttons after the first one
-                            @endphp
+                            action="{{ route('technician.accept', ['job' => $pending->job_req->id, 'code' => $pending->job_req->request_code]) }}"
+                            method="POST">
+                            @csrf
+                            <button class="btn btn-danger w-100 bubble-shadow" id="alert_demo_8"
+                                @if(!$firstEnabled || $hasOngoing) disabled @endif>
+                                Accept
+                            </button>
+                        </form>
+                        @php
+                            $firstEnabled = false; // Disable all other buttons after the first one
+                        @endphp
                     @endif
                     @endif
                     @if($userInfo->usertype === 1)
@@ -322,7 +331,7 @@ use App\Models\Dtruser;
     <div class="page-header" style="margin-bottom: 0; margin-top: 10px;">
         <h1 class="fw-bold mb-3">ONGOING</h1>
     </div>
-
+ 
     <!-- PUT A FOR-LOOP CONTITION HERE -->
     @forelse($job_accepted as $accepted)
         <div class="col-md-3" id="accepted_key{{$accepted->request_code}}">

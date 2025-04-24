@@ -187,6 +187,12 @@ class TechnicianController extends Controller
                 ->first();
         $techfrom = Dtruser::where('username', $activity->tech_from)->first();
         $techto = Dtruser::where('username', $activity->tech_to)->first();
+        
+        if($req->transfer == 'transferred'){
+            Technician::where('userid', $user->userid)->update([
+                'is_available' => 0,
+            ]);
+        }
 
         $transferredData = [
             'request_code' => $req->code,
