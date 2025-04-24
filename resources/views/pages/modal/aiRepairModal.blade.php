@@ -59,14 +59,6 @@
         margin-top: -10px;
     }
     .h3, h3 {
-        /* color: #34495e;
-        border-left: 4px solid #3498db;
-        padding-left: 10px;
-        margin: 25px 0 15px 0;
-        background-color: #edf2f7;
-        padding: 8px 12px;
-        border-radius: 4px;
-        margin-top: -10px; */
         font-size: 18px;
     }
 
@@ -93,8 +85,6 @@
         background-color: #bbb;
         border-radius: 4px;
     }
-
-
 
     /* ---------------------------------------------------- */
 </style>

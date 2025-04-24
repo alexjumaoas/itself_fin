@@ -5,13 +5,13 @@
     .dash {
         display: block;
         transition: transform 0.3s ease, background-color 0.3s ease;
-        text-decoration: none; /* Remove underline */
+        text-decoration: none;
     }
     .dash:hover {
-        transform: scale(1.05); /* Slightly enlarge the card */
+        transform: scale(1.05);
     }
     .dash:hover .card {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Add shadow to the card */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 </style>
 
@@ -20,7 +20,6 @@
     <div class="col-md-6">
         <h3 class="fw-bold mb-3">DASHBOARD</h3>
         <div class="row">
-
             <div class="col-md-12 col-sm-6 dash" data-toggle="modal" data-target="#dashModal">
                 <div class="card card-stats card-round">
                     <div class="card-body">
@@ -137,9 +136,9 @@
             title: "Success!",
             text: "{{ session('success') }}",
             icon: "success",
-            button: "OK", // OK button
-            timer: 3000, // Close after 3 seconds
-            buttons: false, // Disable the button
+            button: "OK", 
+            timer: 3000,
+            buttons: false,
         });
     });
 </script>
@@ -155,29 +154,26 @@
         });
     });
 
-
-
     document.addEventListener("DOMContentLoaded", function () {
-        const checkboxes = document.querySelectorAll(".form-check-input"); // Select all checkboxes
-        const applyRequestBtn = document.querySelector("button[type='submit']"); // Submit button
-        const checkboxOther = document.getElementById("checkValue9"); // "Others" checkbox
-        const textarea = document.getElementById("otherRequest"); // Textarea
+        const checkboxes = document.querySelectorAll(".form-check-input");
+        const applyRequestBtn = document.querySelector("button[type='submit']");
+        const checkboxOther = document.getElementById("checkValue9");
+        const textarea = document.getElementById("otherRequest");
 
-        // Function to toggle textarea visibility
         function toggleTextarea() {
             if (checkboxOther.checked) {
-                textarea.style.display = "block"; // Show textarea
-                textarea.focus(); // Focus on it
+                textarea.style.display = "block";
+                textarea.focus();
             } else {
-                textarea.style.display = "none"; // Hide textarea
-                textarea.value = ""; // Clear input when unchecked
+                textarea.style.display = "none";
+                textarea.value = "";
             }
         }
 
         // Function to enable/disable Apply Request button
         function toggleButtonState() {
             const isChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
-            applyRequestBtn.disabled = !isChecked; // Enable if at least one is checked
+            applyRequestBtn.disabled = !isChecked; 
         }
 
         // Attach event listeners to all checkboxes

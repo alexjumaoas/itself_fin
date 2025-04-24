@@ -222,7 +222,7 @@ use App\Models\Dtruser;
         @endphp
 
         @if($pending->status == "transferred" && (int) $userInfo->username === $pending->tech_to || $pending->status == "pending" )
-
+        
             <div class="col-md-3">
                 <div class="card card-post card-round" style="border-top: 3px solid #f25961;">
                     <div class="card-body">
@@ -541,7 +541,7 @@ use App\Models\Dtruser;
 @include('pages.modal.transferReceiveModal')
 @include('pages.modal.aiRepairModal')
 
-<button id="displayNotif" class="btn btn-success">Display</button>
+{{-- <button id="displayNotif" class="btn btn-success">Display</button> --}}
 
 @if(session('success'))
     <script>

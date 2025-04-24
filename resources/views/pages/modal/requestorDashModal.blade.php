@@ -60,52 +60,43 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($activity_finish as $finish)
+                                        @foreach($activity_history as $record)
+                                            @php
+                                                $user = App\Models\Dtruser::where(function ($query) use ($record) {
+                                                    if (!empty($record->tech_from)) {
+                                                        $query->where('username', $record->tech_from);
+                                                    }
 
-                                        @php
+                                                    if (!empty($record->tech_to)) {
+                                                        $query->orWhere('username', $record->tech_to);
+                                                    }
+                                                })->first();
+                                            @endphp
 
-                                        $user = App\Models\Dtruser::where(function ($query) use ($finish) {
-                                            if (!empty($finish->tech_from)) {
-                                                $query->where('username', $finish->tech_from);
-                                            }
-
-                                            if (!empty($finish->tech_to)) {
-                                                $query->orWhere('username', $finish->tech_to);
-                                            }
-                                        })->first();
-
-                                        @endphp
                                             <tr>
-                                                <td>{{ \Carbon\Carbon::parse($finish->job_req->request_date)->format('F d, Y h:i A') }}</td>
-                                                <td>{{$finish->job_req->description}}</td>
-                                                <td>{{$user ? $user->fname. ' ' . $user->mname. ' ' . $user->lname : 'N/A'}} / {{$finish->diagnosis}}</td>
-                                                <td>{{ \Carbon\Carbon::parse($finish->created_at)->format('F d, Y h:i A') }}</td>
-                                                <td>Completed</td>
-                                            </tr>
-                                        @endforeach
-                                        @foreach($activity_cancelled as $cancelled)
-                                            <tr>
-                                                <td>{{ \Carbon\Carbon::parse($cancelled->job_req->request_date)->format('F d, Y h:i A') }}</td>
-                                                <td>{{$cancelled->job_req->description}}</td>
-                                                <td>{{ $cancelled->remarks}}</td>
-                                                <td>{{ \Carbon\Carbon::parse($cancelled->created_at)->format('F d, Y h:i A')}}</td>
-                                                <td style="color: red;">Cancelled</td>
+                                                <td data-order="{{ \Carbon\Carbon::parse($record->job_req->request_date)->timestamp }}">
+                                                    {{ \Carbon\Carbon::parse($record->job_req->request_date)->format('F d, Y h:i A') }}
+                                                </td>
+                                                <td>{{ $record->job_req->description }}</td>
+                                                <td>
+                                                    @if ($record->status_label == 'Completed')
+                                                        {{ $user ? $user->fname . ' ' . $user->mname . ' ' . $user->lname : 'N/A' }} / {{ $record->diagnosis }}
+                                                    @else
+                                                        {{ $record->remarks }}
+                                                    @endif
+                                                </td>
+                                                <td data-order="{{ \Carbon\Carbon::parse($record->created_at)->timestamp }}">
+                                                    {{ \Carbon\Carbon::parse($record->created_at)->format('F d, Y h:i A') }}
+                                                </td>
+                                                <td style="{{ $record->status_label == 'Cancelled' ? 'color: red;' : '' }}">
+                                                    {{ $record->status_label }}
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-
-                        <!-- <div class="row">
-                            <div class="col-sm-12">
-                                <table id="dashTable" class="table table-hover">
-                                    <tbody>
-                                       
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div> -->
                     </div>
                 </div>
             </div>
@@ -130,32 +121,21 @@
         }, 300);
     });
 
-//   $(document).ready(function() {
-//       let table = $('#dashTable').DataTable({
-//           "paging": true,         // Enable pagination
-//           "lengthMenu": [5, 10, 25, 50], // Rows per page
-//           "searching": true,      // Enable search
-//           "ordering": true,       // Enable sorting
-//           "info": true,           // Show info (e.g., "Showing 1 to 10 of 50 entries")
-//           "autoWidth": false,     // Prevent table width issues
-//           "responsive": true      // Enable responsive design
-//       });
-//   });
-
 $(document).ready(function() {
       let table = $('#dashTable').DataTable({
-          "paging": true,         // Enable pagination
-          "lengthMenu": [5, 10, 25, 50], // Rows per page
-          "searching": true,      // Enable search
-          "ordering": true,       // Enable sorting
-          "info": true,           // Show info (e.g., "Showing 1 to 10 of 50 entries")
-          "autoWidth": false,     // Prevent table width issues
-          "responsive": true      // Enable responsive design
+          "paging": true,        
+          "lengthMenu": [5, 10, 25, 50], 
+          "searching": true,     
+          "ordering": true,       
+          "order": [[3, "desc"]],
+          "info": true,          
+          "autoWidth": false,    
+          "responsive": true   
       });
 
       //Fix DataTable re-rendering issue when modal opens
       $('#dashModal').on('shown.bs.modal', function() {
-          table.columns.adjust().responsive.recalc();
+            table.columns.adjust()
       });
   });
 

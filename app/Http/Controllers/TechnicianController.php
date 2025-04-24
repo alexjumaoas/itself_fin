@@ -34,10 +34,18 @@ class TechnicianController extends Controller
             ->get();
 
         $job_pending = collect($this->jobRequestService->getJobRequestByStatus('pending'))
-            ->merge($this->jobRequestService->getJobRequestByStatus('transferred'));
+            ->merge($this->jobRequestService->getJobRequestByStatus('transferred'))
+            ->sortBy('created_at')
+            ->values();
 
-        $job_accepted = $this->jobRequestService->getJobRequestByStatus('accepted');
-        $job_transferred = $this->jobRequestService->getJobRequestByStatus('transferred');
+        $job_accepted = collect($this->jobRequestService->getJobRequestByStatus('accepted'))
+            ->sortBy('created_at')
+            ->values();
+
+        $job_transferred = $this->jobRequestService->getJobRequestByStatus('transferred')
+            ->sortBy('created_at')
+            ->values();
+
         $totalPending = $job_pending->count();
 
         return view('pages.admin.request',  compact('job_pending','job_accepted','get_technician','job_transferred', 'totalPending'));

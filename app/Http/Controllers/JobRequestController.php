@@ -13,10 +13,6 @@ use Illuminate\Http\Request;
 
 class JobRequestController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-
      protected $jobRequestService;
 
      public function __construct(JobRequestService $jobRequestService)
@@ -28,16 +24,21 @@ class JobRequestController extends Controller
     {
         $user = $req->get('currentUser');
 
-        $activity_reqs = $this->jobRequestService->getJobRequestByStatus('pending', null, $user->username);
-       
-        $activity_finish = $this->jobRequestService->getJobRequestByStatus('completed', null, $user->username);
-        $activity_acept = $this->jobRequestService->getJobRequestByStatus('accepted', null, $user->username)
-            ->merge($this->jobRequestService->getJobRequestByStatus('transferred', null, $user->username));
+        $activity_reqs = collect($this->jobRequestService->getJobRequestByStatus('pending', null, $user->username))
+            ->sortBy('created_at')
+            ->values();
 
-            $technicians = Technician::with('dtrUser.dtsUser.designationRel')
-                ->where('status', 'active')
-                ->orderBy('id','desc')
-                ->get();
+        $activity_acept = collect($this->jobRequestService->getJobRequestByStatus('accepted', null, $user->username))
+            ->merge($this->jobRequestService->getJobRequestByStatus('transferred', null, $user->username))
+            ->sortBy('created_at')
+            ->values();
+
+        $activity_finish = $this->jobRequestService->getJobRequestByStatus('completed', null, $user->username);
+
+        $technicians = Technician::with('dtrUser.dtsUser.designationRel')
+            ->where('status', 'active')
+            ->orderBy('id','desc')
+            ->get();
        
         return view('pages.requestor.newRequest', compact('activity_reqs','activity_acept','user','technicians'));
     }
@@ -45,15 +46,40 @@ class JobRequestController extends Controller
     public function viewRequest(Request $req){
         $user = $req->get('currentUser');
 
-        $activity_finish_count = $this->jobRequestService->getJobRequestByStatus('completed', null, $user->username)->count();
-        $activity_cancelled_count = $this->jobRequestService->getJobRequestByStatus('cancelled', null, $user->username)->count();
+        // $activity_finish_count = $this->jobRequestService->getJobRequestByStatus('completed', null, $user->username)->count();
+        // $activity_cancelled_count = $this->jobRequestService->getJobRequestByStatus('cancelled', null, $user->username)->count();
+        // $activity_finish = $this->jobRequestService->getJobRequestByStatus('completed', null, $user->username)
+        //     ->sortByDesc('created_at',)
+        //     ->values();
+        // $activity_cancelled = $this->jobRequestService->getJobRequestByStatus('cancelled', null, $user->username);
+        // $totalRequest = $activity_finish_count + $activity_cancelled_count;
 
-        $activity_finish = $this->jobRequestService->getJobRequestByStatus('completed', null, $user->username);
-        $activity_cancelled = $this->jobRequestService->getJobRequestByStatus('cancelled', null, $user->username);
+        //------------------------------------------------------------------------------
+        // Get both status separately
+        $activity_finish = collect($this->jobRequestService->getJobRequestByStatus('completed', null, $user->username));
+        $activity_cancelled = collect($this->jobRequestService->getJobRequestByStatus('cancelled', null, $user->username));
 
-        $totalRequest = $activity_finish_count + $activity_cancelled_count;
+        // Add status labels
+        $activity_finish->transform(function ($item) {
+            $item->status_label = 'Completed';
+            return $item;
+        });
+
+        $activity_cancelled->transform(function ($item) {
+            $item->status_label = 'Cancelled';
+            return $item;
+        });
+
+        // Merge & sort by created_at descending
+        $activity_history = $activity_finish
+            ->merge($activity_cancelled)
+            ->sortByDesc('created_at')
+            ->values(); // reindex the array
+
+        $totalRequest = $activity_finish->count() + $activity_cancelled->count();
+        //------------------------------------------------------------------------------
         
-        return view('pages.requestor.requestForm', compact('totalRequest', 'activity_finish', 'activity_cancelled'));
+        return view('pages.requestor.requestForm', compact('totalRequest', 'activity_history'));
     }
     
     public function saverequest(Request $req){
