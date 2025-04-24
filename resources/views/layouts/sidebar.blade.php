@@ -32,7 +32,7 @@ use App\Models\Job_request;
         </li>
         <li class="nav-item {{ request()->routeIs('finished') ? 'active' : '' }}">
             <a href="{{ route('finished') }}">
-                <i class="fas  fa-tasks"></i>
+                <i class="fas fa-tasks"></i>
                 <p>Finished</p>
             </a>
         </li>
@@ -53,13 +53,12 @@ use App\Models\Job_request;
             <a href="{{ route('technician.request') }}">
                 <i class="fas fa-desktop"></i>
                 <p>Request</p>
-                <!-- <span class="badge badge-warning">1</span> -->
                 <span class="badge badge-danger">{{ $totalPending ?? 0 }}</span>
             </a>
         </li>
         <li class="nav-item {{ request()->routeIs('technician.finished') ? 'active' : '' }}">
             <a href="{{ route('technician.finished') }}">
-                <i class="fas  fa-tasks"></i>
+                <i class="fas fa-tasks"></i>
                 <p>Finished</p>
             </a>
         </li>

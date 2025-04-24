@@ -12,7 +12,7 @@ use App\Models\Request_History;
 use App\Services\JobRequestService;
 use App\Models\Activity_request;
 use Illuminate\Support\Facades\Redirect;
-
+use Carbon\Carbon;
 
 
 class AdminController extends Controller
@@ -42,13 +42,10 @@ class AdminController extends Controller
             $completedCount = $this->jobRequestService->getJobRequestByStatus('completed')->count();
             $cancelledCount = $this->jobRequestService->getJobRequestByStatus('cancelled')->count();
             $traferredCount = $this->jobRequestService->getJobRequestByStatus('transferred')->count();
-
         }
         $totalPending = $pendingCount + $traferredCount;
         $totalRequest = $totalPending  + $acceptedCount + $cancelledCount + $completedCount;
 
-        //--------------------------------------------------------------------------------------
-        // Get the monthly average completion times for the chart
         $monthlyCompletionTimes = DB::table('activity_requests as completed')
             ->join('activity_requests as accepted', function($join) {
                 $join->on('completed.job_request_id', '=', 'accepted.job_request_id')
@@ -59,13 +56,10 @@ class AdminController extends Controller
             ->groupBy(DB::raw('MONTH(completed.created_at)'))
             ->pluck('avg_time_hours', 'month')
             ->toArray();
-
-        // Format monthly completion data
         $monthlyCompletionData = [];
         for ($i = 1; $i <= 12; $i++) {
             $monthlyCompletionData[] = round($monthlyCompletionTimes[$i] ?? 0, 2);
         }
-        //--------------------------------------------------------------------------------------
 
         $monthlyCompleted = Activity_request::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
             ->where('status', 'completed')
@@ -78,14 +72,10 @@ class AdminController extends Controller
             $monthlyRequest[] = $monthlyCompleted[$i] ?? 0;
         }
 
-        $latestActivities = Activity_request::select(DB::raw('MAX(id) as id'))
-            ->groupBy('request_code');
-
-        $recentAcceptedCompleted = Activity_request::with(['job_req.requester', 'techFromUser'])
-            ->whereIn('id', $latestActivities)
-            ->whereIn('status', ['accepted', 'completed'])
+        $recentActivityRequests = Activity_request::with(['job_req.requester', 'techFromUser'])
+            ->whereDate('created_at', Carbon::today())
+            ->orWhereDate('created_at', Carbon::yesterday())
             ->orderByDesc('created_at')
-            // ->take(5) // limit to recent 5 if needed
             ->get();
 
         return view("pages.admin.dashboard", compact(
@@ -97,7 +87,7 @@ class AdminController extends Controller
             'traferredCount',
             'totalRequest',
             'monthlyRequest',
-            'recentAcceptedCompleted',
+            'recentActivityRequests',
             'monthlyCompletionData'
         ));
     }
@@ -105,39 +95,39 @@ class AdminController extends Controller
     public function getAllTechnican()
     {
         $totalPending = 0;
-        $traferredCount = 0;
         $pendingCount = $this->jobRequestService->getJobRequestByStatus('pending')->count();
-        $traferredCount = $this->jobRequestService->getJobRequestByStatus('transferred')->count();
+        $transferredCount = $this->jobRequestService->getJobRequestByStatus('transferred')->count();
+        $totalPending = $pendingCount + $transferredCount;
 
         $dts_users = Dts_user::select('id', 'username', 'designation', 'division', 'section')
-        ->with([
-            'designationRel' => function ($query){
+            ->with([
+                'designationRel' => function ($query){
 
-                $query->select('id', 'description');
-            },
-            'divisionRel' => function ($query){
-                $query->select('id', 'description');
-            },
-            'sectionRel' => function ($query){
-                $query->select('id', 'description');
-            },
-            'dtrUsers' => function ($query) {
-                // Apply the filter inside the relation itself
-                $query->where('usertype', '!=', 2);
-                $query->where('usertype', '!=', 1);
-            }
-            ])
-        ->where('division', 3)
-        ->where('section', 80)
-        ->orderBy('id','desc')
-        ->get();
+                    $query->select('id', 'description');
+                },
+                'divisionRel' => function ($query){
+                    $query->select('id', 'description');
+                },
+                'sectionRel' => function ($query){
+                    $query->select('id', 'description');
+                },
+                'dtrUsers' => function ($query) {
+                    // Apply the filter inside the relation itself
+                    $query->where('usertype', '!=', 2);
+                    $query->where('usertype', '!=', 1);
+                }
+                ])
+            ->where('division', 3)
+            ->where('section', 80)
+            ->orderBy('id','desc')
+            ->get();
 
         $technicians = Technician::with('dtrUser.dtsUser.designationRel')
-        ->where('status', 'active')
-        ->orderBy('id','desc')
-        ->paginate(10);
+            ->where('status', 'active')
+            ->orderBy('id','desc')
+            ->paginate(10);
 
-        return view('pages.admin.display_tech', compact('technicians','dts_users'));
+        return view('pages.admin.display_tech', compact('technicians','dts_users', 'totalPending'));
     }
 
     public function SavedTechnician(Request $req)

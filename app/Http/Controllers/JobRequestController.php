@@ -46,39 +46,25 @@ class JobRequestController extends Controller
     public function viewRequest(Request $req){
         $user = $req->get('currentUser');
 
-        // $activity_finish_count = $this->jobRequestService->getJobRequestByStatus('completed', null, $user->username)->count();
-        // $activity_cancelled_count = $this->jobRequestService->getJobRequestByStatus('cancelled', null, $user->username)->count();
-        // $activity_finish = $this->jobRequestService->getJobRequestByStatus('completed', null, $user->username)
-        //     ->sortByDesc('created_at',)
-        //     ->values();
-        // $activity_cancelled = $this->jobRequestService->getJobRequestByStatus('cancelled', null, $user->username);
-        // $totalRequest = $activity_finish_count + $activity_cancelled_count;
-
-        //------------------------------------------------------------------------------
-        // Get both status separately
         $activity_finish = collect($this->jobRequestService->getJobRequestByStatus('completed', null, $user->username));
         $activity_cancelled = collect($this->jobRequestService->getJobRequestByStatus('cancelled', null, $user->username));
 
-        // Add status labels
         $activity_finish->transform(function ($item) {
             $item->status_label = 'Completed';
             return $item;
         });
-
         $activity_cancelled->transform(function ($item) {
             $item->status_label = 'Cancelled';
             return $item;
         });
 
-        // Merge & sort by created_at descending
         $activity_history = $activity_finish
             ->merge($activity_cancelled)
             ->sortByDesc('created_at')
-            ->values(); // reindex the array
+            ->values(); 
 
         $totalRequest = $activity_finish->count() + $activity_cancelled->count();
-        //------------------------------------------------------------------------------
-        
+    
         return view('pages.requestor.requestForm', compact('totalRequest', 'activity_history'));
     }
     
@@ -94,19 +80,17 @@ class JobRequestController extends Controller
             $req->install_soft,
             $req->bio_reg,
             $req->system_tech,
-            $req->check_others, // Ensure it is not null if applicable
-            $req->others_input, // This is a text input
+            $req->check_others,
+            $req->others_input,
         ];
 
         $filteredDescriptions = array_filter($descriptions, function ($value) {
             return !is_null($value) && $value !== '';
         });
 
-        // Implode array into a comma-separated string
         $descriptionString = implode(', ', $filteredDescriptions);
 
         $request_it = new Job_request();
-
         $request_it->request_code = now()->format('YmdHis') . '-' . rand(1000, 9999);
         $request_it->description = $descriptionString;
         $request_it->requester_id =  $user->userid;
@@ -125,18 +109,18 @@ class JobRequestController extends Controller
         ->first();
         
         return redirect()->route('currentRequest')
-        ->with('success', 'Successfully created request!')
-        ->with('PendingData', [
-            'request_code' =>  $request_it->request_code,
-            'request_date' => $request_it->request_date,
-            'job_request_id' => $request_it->id,
-            'description' => $request_it->description,
-            'requester_name' => optional($activityRequest->job_req->requester)->fname . ' ' . optional($activityRequest->job_req->requester)->lname,
-            'section' => $activityRequest->job_req->requester->sectionRel->acronym,
-            'division' => $activityRequest->job_req->requester->divisionRel->description,
-            'timestamp' => Carbon::now()->toIso8601String(),
-            'status' => 'pending'
-        ]);
+            ->with('success', 'Successfully created request!')
+            ->with('PendingData', [
+                'request_code' =>  $request_it->request_code,
+                'request_date' => $request_it->request_date,
+                'job_request_id' => $request_it->id,
+                'description' => $request_it->description,
+                'requester_name' => optional($activityRequest->job_req->requester)->fname . ' ' . optional($activityRequest->job_req->requester)->lname,
+                'section' => $activityRequest->job_req->requester->sectionRel->acronym,
+                'division' => $activityRequest->job_req->requester->divisionRel->description,
+                'timestamp' => Carbon::now()->toIso8601String(),
+                'status' => 'pending'
+            ]);
     }
 
     public function cancelRequest(Request $req, $id){
@@ -160,7 +144,6 @@ class JobRequestController extends Controller
         $act_req->job_request_id = $id;
         $act_req->requester_id = $job_req->requester_id;
         $act_req->request_code = $req->req_code;
-        $act_req->tech_from = $user->userid;
         $act_req->status = "cancelled";
         $act_req->remarks = $req->cancelRemarks;
         $act_req->save();

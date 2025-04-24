@@ -5,15 +5,15 @@
     .dash {
         display: block;
         transition: transform 0.3s ease, background-color 0.3s ease;
-        text-decoration: none; /* Remove underline */
+        text-decoration: none;
     }
 
     .dash:hover {
-        transform: scale(1.05); /* Slightly enlarge the card */
+        transform: scale(1.05);
     }
 
     .dash:hover .card {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Add shadow to the card */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     @keyframes moveDown {
@@ -50,7 +50,6 @@
 </div>
 
 <div class="row">
-
     <div class="col-sm-6 col-md-3">
         <div class="card card-stats card-round">
             <div class="card-body">
@@ -141,7 +140,7 @@
 </div>
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-sm-6 col-md-4">
         <div class="card">
             <div class="card-header">
                 <div class="card-title">Request Completion Time</div>
@@ -154,7 +153,7 @@
         </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-sm-6 col-md-4">
         <div class="card">
             <div class="card-header">
                 <div class="card-title">Request Per Month</div>
@@ -167,7 +166,7 @@
         </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-sm-6 col-md-4">
         <div class="card">
             <div class="card-header">
                 <div class="card-title">Request Status Distribution</div>
@@ -183,7 +182,7 @@
 
 <!-- Data Table -->
 <div class="row">
-    <div class="col-12">
+    <div class="col-sm-6 col-md-12">
         <div class="card">
             <div class="card-header">
                 <div class="card-title">Recent Activity Requests</div>
@@ -193,7 +192,6 @@
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Date Requested</th>
                                 <th>Request Code</th>
                                 <th>Requester</th>
                                 <th>Department</th>
@@ -203,9 +201,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($recentAcceptedCompleted as $activity)
+                            @foreach($recentActivityRequests as $activity)
                                 <tr>
-                                    <td>{{ \Carbon\Carbon::parse($activity->created_at)->format('M d, Y h:i:s A') }}</td>
                                     <td>{{ $activity->request_code }}</td>
                                     <td>
                                         {{
@@ -228,13 +225,35 @@
                                     </td>
                                     <td>
                                         @php
-                                            $isCompleted = $activity->status === 'completed';
-                                            $badgeClass = $isCompleted ? 'bg-success' : 'bg-secondary';
-                                            $label = $isCompleted ? 'Completed' : 'Ongoing'; // change 'accepted' to 'Ongoing'
+                                            switch ($activity->status) {
+                                                case 'completed':
+                                                    $badgeClass = 'bg-success';
+                                                    $label = 'Completed';
+                                                    break;
+                                                case 'accepted':
+                                                    $badgeClass = 'bg-secondary';
+                                                    $label = 'Ongoing';
+                                                    break;
+                                                case 'pending':
+                                                    $badgeClass = 'bg-danger';
+                                                    $label = 'Pending';
+                                                    break;
+                                                case 'transferred':
+                                                    $badgeClass = 'bg-info';
+                                                    $label = 'Transferred';
+                                                    break;
+                                                case 'cancelled':
+                                                    $badgeClass = 'bg-warning';
+                                                    $label = 'Cancelled';
+                                                    break;
+                                                default:
+                                                    $badgeClass = 'bg-light text-dark';
+                                                    $label = ucfirst($activity->status ?? 'Unknown');
+                                            }
                                         @endphp
                                         <span class="badge {{ $badgeClass }}">{{ $label }}</span>
                                     </td>
-                                    <td>{{ \Carbon\Carbon::parse($activity->updated_at)->format('M d, Y h:i:s A') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($activity->created_at)->format('M d, Y h:i:s A') }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

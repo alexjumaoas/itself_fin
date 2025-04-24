@@ -34,6 +34,10 @@
     .modal.fade .modal-dialog {
         animation: elasticPopOut 0.3s ease-in;
     }
+    table#dashTable > thead > tr > th,
+    table#dashTable > tbody > tr > td {
+        border: none !important;
+    }
 </style>
 
 <!-- Modal -->

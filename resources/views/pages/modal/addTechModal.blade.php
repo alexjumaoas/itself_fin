@@ -35,8 +35,6 @@
         animation: elasticPopOut 0.3s ease-in;
     }
 </style>
-
-
 <!-- Modal -->
 <div class="modal modal-xl" id="addTechModal" role="dialog" aria-labelledby="addTechModalLabel" aria-hidden="true" data-backdrop="static">
   <div class="modal-dialog" role="document">
@@ -48,13 +46,6 @@
         <div class="col-md-12">
           <div class="table-responsive">
             <div id="basic-datatables_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
-              <!-- <div class="row">
-                <div class="col-sm-12 col-md-12">
-                  <div id="basic-datatables_filter" class="dataTables_filter">
-                      <label>Search:<input type="search" class="form-control form-control-sm" placeholder="" aria-controls="basic-datatables"></label>
-                  </div>
-                </div>
-              </div> -->
               <div class="row">
                 <div class="col-sm-12">
                   <table id="techTable" class="table table-hover">
@@ -162,18 +153,18 @@
 
   $(document).ready(function() {
       let table = $('#techTable').DataTable({
-          "paging": true,         // Enable pagination
-          "lengthMenu": [5, 10, 25, 50], // Rows per page
-          "searching": true,      // Enable search
-          "ordering": true,       // Enable sorting
-          "info": true,           // Show info (e.g., "Showing 1 to 10 of 50 entries")
-          "autoWidth": false,     // Prevent table width issues
-          "responsive": true      // Enable responsive design
+          "paging": true,      
+          "lengthMenu": [5, 10, 25, 50], 
+          "searching": true,     
+          "ordering": true,   
+          "info": true,       
+          "autoWidth": false, 
+          "responsive": true 
       });
 
       //Fix DataTable re-rendering issue when modal opens
       $('#addTechModal').on('shown.bs.modal', function() {
-          table.columns.adjust().responsive.recalc();
+          table.columns.adjust();
       });
   });
 

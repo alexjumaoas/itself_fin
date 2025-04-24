@@ -23,7 +23,8 @@ class TechnicianController extends Controller
         $this->jobRequestService = $jobRequestService;
     }
 
-    public function requestor(Request $req){
+    public function requestor(Request $req)
+    {
 
         $user = $req->get('currentUser');
 
@@ -140,10 +141,13 @@ class TechnicianController extends Controller
     }
 
     public function finished(){
-
+        $totalPending = 0;
+        $pendingCount = $this->jobRequestService->getJobRequestByStatus('pending')->count();
+        $transferredCount = $this->jobRequestService->getJobRequestByStatus('transferred')->count();
         $job_completed =  $this->jobRequestService->getJobRequestByStatus('completed');
+        $totalPending = $pendingCount + $transferredCount;
 
-        return view('pages.admin.finished', compact('job_completed'));
+        return view('pages.admin.finished', compact('job_completed', 'totalPending'));
     }
 
     public function done(Request $req){
@@ -165,13 +169,6 @@ class TechnicianController extends Controller
         Technician::where('userid', $user->userid)->update([
             'is_available' => 0,
         ]);
-
-        // $done = Request_History::where('request_code', $req->code)->first();
-        // $done->action = $req->action;
-        // $done->diagnosis = $req->diagnosis;
-        // $done->resolution_notes = $req->resolution;
-        // $done->completion_date = Carbon::now();
-        // $done->save();
 
         return Redirect::back()->with('success', 'You have successfully finished a request!');
     }
@@ -216,9 +213,6 @@ class TechnicianController extends Controller
             'status' => 'transferred'
         ];
 
-        // session()->flash('success', 'Successfully accepted request!');
-        // session()->flash('transferredData', $transferredData);
-
         return Redirect::back()->with([
             'success' => 'Request is successfuly transferred',
             'transferredData' => $transferredData
@@ -231,11 +225,10 @@ class TechnicianController extends Controller
                         ->where('status', 'accpeted')
                         ->orderBy('created_at', 'desc')
                         ->first();
-
+                        
         return response()->json([
             'success' =>  $tatestaccepted
         ]);
-
     }
 
     public function generateRepairSteps(Request $request, OpenAIService $openAIService)
