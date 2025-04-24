@@ -76,6 +76,10 @@ class AdminController extends Controller
 
     public function getAllTechnican()
     {
+        $totalPending = 0;
+        $traferredCount = 0;
+        $pendingCount = $this->jobRequestService->getJobRequestByStatus('pending')->count();
+        $traferredCount = $this->jobRequestService->getJobRequestByStatus('transferred')->count();
 
         $dts_users = Dts_user::select('id', 'username', 'designation', 'division', 'section')
         ->with([
@@ -105,7 +109,10 @@ class AdminController extends Controller
         ->orderBy('id','desc')
         ->paginate(10);
         // dd($technicians);
-        return view('pages.admin.display_tech', compact('technicians','dts_users'));
+
+        $totalPending = $pendingCount + $traferredCount;
+
+        return view('pages.admin.display_tech', compact('technicians','dts_users', 'totalPending'));
     }
 
     public function SavedTechnician(Request $req)

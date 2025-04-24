@@ -94,6 +94,11 @@
         $(this).addClass('showing');
     });
 
+    // $('#confirmCancel').on('click', function () {
+    //     $('#cancelForm').trigger('submit');
+    // });
+
+
 
     $('#cancelForm').on('submit', function (e){
         e.preventDefault();
@@ -116,7 +121,6 @@
             },
             success: function(response){
                 if (response.canCancel || response.otherCancel) {
-                     
                     $.ajax({
                         url: "{{ route('admin.cancel') }}",
                         type: 'POST',
@@ -138,7 +142,7 @@
                                 divPending.remove();
                                 // Close modal and refresh page if needed
                                 $('#cancelModal').modal('hide');
-                                // location.reload();
+                                location.reload();
                             });
                         },
                         error: function(xhr, status, error) {
