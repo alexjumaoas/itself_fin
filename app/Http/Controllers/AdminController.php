@@ -47,17 +47,36 @@ class AdminController extends Controller
         $totalPending = $pendingCount + $traferredCount;
         $totalRequest = $totalPending  + $acceptedCount + $cancelledCount + $completedCount;
 
+        //--------------------------------------------------------------------------------------
+        // Get the monthly average completion times for the chart
+        $monthlyCompletionTimes = DB::table('activity_requests as completed')
+            ->join('activity_requests as accepted', function($join) {
+                $join->on('completed.job_request_id', '=', 'accepted.job_request_id')
+                    ->where('accepted.status', '=', 'accepted')
+                    ->where('completed.status', '=', 'completed');
+            })
+            ->selectRaw('MONTH(completed.created_at) as month, AVG(TIMESTAMPDIFF(MINUTE, accepted.created_at, completed.created_at)) / 60 as avg_time_hours')
+            ->groupBy(DB::raw('MONTH(completed.created_at)'))
+            ->pluck('avg_time_hours', 'month')
+            ->toArray();
+
+        // Format monthly completion data
+        $monthlyCompletionData = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $monthlyCompletionData[] = round($monthlyCompletionTimes[$i] ?? 0, 2);
+        }
+        //--------------------------------------------------------------------------------------
+
         $monthlyCompleted = Activity_request::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
             ->where('status', 'completed')
             ->groupBy(DB::raw('MONTH(created_at)'))
             ->pluck('total', 'month')
             ->toArray();
-        $data = [];
-        for ($i = 1; $i <= 12; $i++) {
-            $data[] = $monthlyCompleted[$i] ?? 0;
-        }
 
-        //---------------------------------------------------------------------------------
+        $monthlyRequest = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $monthlyRequest[] = $monthlyCompleted[$i] ?? 0;
+        }
 
         $latestActivities = Activity_request::select(DB::raw('MAX(id) as id'))
             ->groupBy('request_code');
@@ -69,9 +88,18 @@ class AdminController extends Controller
             // ->take(5) // limit to recent 5 if needed
             ->get();
 
-        //---------------------------------------------------------------------------------
-
-        return view("pages.admin.dashboard", compact('totalPending', 'pendingCount', 'acceptedCount', 'completedCount','cancelledCount','traferredCount', 'totalRequest', 'data', 'recentAcceptedCompleted'));
+        return view("pages.admin.dashboard", compact(
+            'totalPending',
+            'pendingCount',
+            'acceptedCount',
+            'completedCount',
+            'cancelledCount',
+            'traferredCount',
+            'totalRequest',
+            'monthlyRequest',
+            'recentAcceptedCompleted',
+            'monthlyCompletionData'
+        ));
     }
 
     public function getAllTechnican()
@@ -108,11 +136,8 @@ class AdminController extends Controller
         ->where('status', 'active')
         ->orderBy('id','desc')
         ->paginate(10);
-        // dd($technicians);
 
-        $totalPending = $pendingCount + $traferredCount;
-
-        return view('pages.admin.display_tech', compact('technicians','dts_users', 'totalPending'));
+        return view('pages.admin.display_tech', compact('technicians','dts_users'));
     }
 
     public function SavedTechnician(Request $req)

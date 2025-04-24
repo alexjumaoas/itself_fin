@@ -16,9 +16,7 @@ Route::get('/logout', [LoginUserController::class, 'logout'])->name('logout');
 
 // for requestor
 Route::middleware(['check.user.type:0', 'load.user.data'])->group(function () {
-    Route::get('/requestForm', function () {
-        return view('pages.requestor.requestForm');
-    })->name('requestForm');
+    Route::get('/requestForm', [JobRequestController::class, 'viewRequest'])->name('requestForm');
     Route::get('/currentRequest', [JobRequestController::class, 'index'])->name('currentRequest');
     Route::post('saveRequest', [JobRequestController::class, 'saverequest'])->name('saveRequest');
     Route::Post('/requests/{job}/cancel', [JobRequestController::class, 'cancelRequest'])->name('requests.cancel');

@@ -6,6 +6,7 @@ use App\Models\Job_request;
 use App\Models\Dtruser;
 use App\Models\Activity_request;
 use App\Services\JobRequestService;
+use App\Models\Technician;
 use Carbon\Carbon;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Http\Request;
@@ -22,7 +23,6 @@ class JobRequestController extends Controller
      {
          $this->jobRequestService = $jobRequestService;
      }
- 
 
     public function index(Request $req)
     {
@@ -33,8 +33,27 @@ class JobRequestController extends Controller
         $activity_finish = $this->jobRequestService->getJobRequestByStatus('completed', null, $user->username);
         $activity_acept = $this->jobRequestService->getJobRequestByStatus('accepted', null, $user->username)
             ->merge($this->jobRequestService->getJobRequestByStatus('transferred', null, $user->username));
-     
-        return view('pages.requestor.newRequest', compact('activity_reqs','activity_acept','user'));
+
+            $technicians = Technician::with('dtrUser.dtsUser.designationRel')
+                ->where('status', 'active')
+                ->orderBy('id','desc')
+                ->get();
+       
+        return view('pages.requestor.newRequest', compact('activity_reqs','activity_acept','user','technicians'));
+    }
+
+    public function viewRequest(Request $req){
+        $user = $req->get('currentUser');
+
+        $activity_finish_count = $this->jobRequestService->getJobRequestByStatus('completed', null, $user->username)->count();
+        $activity_cancelled_count = $this->jobRequestService->getJobRequestByStatus('cancelled', null, $user->username)->count();
+
+        $activity_finish = $this->jobRequestService->getJobRequestByStatus('completed', null, $user->username);
+        $activity_cancelled = $this->jobRequestService->getJobRequestByStatus('cancelled', null, $user->username);
+
+        $totalRequest = $activity_finish_count + $activity_cancelled_count;
+        
+        return view('pages.requestor.requestForm', compact('totalRequest', 'activity_finish', 'activity_cancelled'));
     }
     
     public function saverequest(Request $req){

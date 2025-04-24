@@ -45,7 +45,8 @@
             <form action="{{ route('technician.transfer') }}" method="POST">
                 @csrf
                 <input type="hidden" name="code" id="request_code">
-                <input type="hidden" name="request_id" id ="job_request_id">
+                <input type="hidden" name="request_id" id ="job_request_id"> 
+                <input type="hidden" name="transfer" value="transferred"> 
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="transferTo">Transfer to :</label>

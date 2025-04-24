@@ -14,7 +14,8 @@ class JobRequestService
             ->groupBy('job_request_id')
             ->pluck('max_id');
       
-        $query =  Activity_request::whereIn('id', $latestIds);
+        $query =  Activity_request::whereIn('id', $latestIds)
+                    ->orderBy('id', 'desc');
 
         if($query !== null){
             $query->where('status', $status);

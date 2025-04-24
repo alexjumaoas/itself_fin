@@ -59,13 +59,7 @@
         height: 70px; 
     }
 
-    
-
-
-
-
   </style>
-
 
     <!-- <div class="wrapper"> -->
         <div class="main-panel">
